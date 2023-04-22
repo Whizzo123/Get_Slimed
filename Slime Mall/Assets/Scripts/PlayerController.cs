@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     SpriteRenderer sr;
 
     [Header("Move")]
-    [Range(1f, 10f), Tooltip("Player movement speed")]
+    [Range(1f, 100f), Tooltip("Player movement speed")]
     public float moveSpeed = 5f;
 
     void Awake()
@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
     {
         //Movement
         rb.velocity = Vector2.zero;
-        rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed;
+        rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
     }
 
     void DoInteract(InputAction.CallbackContext obj)
