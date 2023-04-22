@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d12ec97494c36541bfd01e54439b894, type: 3}
-  m_Name: NPCBasic
+  m_Name: NPCBasicFemale
   m_EditorClassIdentifier: 
   intScore: 0
   Speed: 5
   radius: 5
-  sprite: {fileID: 21300000, guid: a78215668a5adf34eb52ca0928034e24, type: 3}
+  sprite: {fileID: 21300000, guid: f223a357e44f23a41bbfde7b275c1c59, type: 3}
   spriteColour: {r: 1, g: 1, b: 1, a: 1}
