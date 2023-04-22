@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     [Range(0,360)]
     public float sessionLenght = 120;
+    public float score = 0;
 
     bool isGamePaused = false;
 
