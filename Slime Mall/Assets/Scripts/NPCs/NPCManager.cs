@@ -11,6 +11,8 @@ public class NPCManager : MonoBehaviour
         public int amount;
     }
 
+    public static NPCManager instance;
+
     public List<NPC> NPCList;
     List<GameObject> entities = new List<GameObject>();
 
@@ -25,6 +27,8 @@ public class NPCManager : MonoBehaviour
 
     void Awake()
     {
+        if (instance == null) instance = this;
+        else Destroy(this);
         SpawnNPCs();
     }
 
