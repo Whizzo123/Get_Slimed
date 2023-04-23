@@ -127,9 +127,11 @@ public class PlayerController : MonoBehaviour
         {
             if(col.CompareTag("Killable"))
             {
+                animator.SetTrigger("Consume");
                 transform.position = col.gameObject.transform.position;
                 NPCManager.instance.KillNPC(col.gameObject);
                 GameManager.instance.UpdateScore();
+
                 return;
             }
         }
