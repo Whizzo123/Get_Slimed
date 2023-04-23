@@ -13,7 +13,7 @@ public class NPCBehaviour : MonoBehaviour
 
     Rigidbody2D rb;
     SpriteRenderer sr;
-
+    Animator animator;
     Vector2 dir;
 
     float idleTime;
@@ -27,6 +27,7 @@ public class NPCBehaviour : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         lastStep = Time.time;
     }
 
@@ -42,6 +43,7 @@ public class NPCBehaviour : MonoBehaviour
         idleTime = settings.idleTime + offset;
         offset = Random.Range(wanderTime, wanderTime + 5);
         wanderTime = settings.wanderTime + offset;
+        animator.runtimeAnimatorController = settings.animator;
     }
 
     void Update()
@@ -83,6 +85,8 @@ public class NPCBehaviour : MonoBehaviour
                 //Run opposite of slime at increased speed
                 break;
         }
+        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
+        animator.SetFloat("Vertical", rb.velocity.normalized.y);
     }
 
     public Vector2 FindDirection()
