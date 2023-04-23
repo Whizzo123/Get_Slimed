@@ -15,16 +15,12 @@ public class NPCManager : MonoBehaviour
     public static NPCManager instance;
 
     public List<NPC> NPCList;
-    List<GameObject> entities = new List<GameObject>();
+    List<NPCBehaviour> entities = new List<NPCBehaviour>();
 
     public GameObject NPCPrefab;
 
     [Range(0f, 2f)]
     public float NPCMoveSpeed = 1;
-
-    [Range(1f, 10f)]
-    public float orderOffset = 5;
-    float lastOrderGiven = -10;
 
     void Awake()
     {
@@ -33,66 +29,28 @@ public class NPCManager : MonoBehaviour
         SpawnNPCs();
     }
 
-    void Update()
-    {  
-        if(Time.time >= lastOrderGiven + orderOffset) 
-        {
-            lastOrderGiven = Time.time;
-            for (int i = 0; i < entities.Count; i++)
-            {
-                StartCoroutine(Move(entities[i], NPCMoveSpeed));
-            }
-        }
-    }
-
     public void SpawnNPCs()
     {
         for (int i = 0; i < NPCList.Count; i++)
         {           
             for (int j = 0; j < NPCList[i].amount; j++)
             {
-                GameObject temp = Instantiate(NPCPrefab, transform);
-                temp.GetComponent<SpriteRenderer>().sprite = NPCList[i].npc.sprite;
-                temp.GetComponent<SpriteRenderer>().color = NPCList[i].npc.spriteColour;
-                entities.Add(temp);
+                GameObject temp = Instantiate(NPCPrefab, new Vector3(Random.insideUnitCircle.x * 5, Random.insideUnitCircle.y * 5, 0), Quaternion.identity, transform);
+                temp.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].npc);
+                entities.Add(temp.GetComponent<NPCBehaviour>());
             }
-        }
-    }
-
-    public Vector3 FindLocation()
-    {
-        return new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0);
-    }
-
-    public IEnumerator Move(GameObject obj, float time)
-    {
-        Vector3 startingPos = obj.transform.position;
-        Vector3 spot = 5 * FindLocation() + startingPos;
-
-        float elapsedTime = 0;
-
-        while (elapsedTime < time)
-        {
-            //Was killed while moving
-            if (!obj)
-            {
-                yield break;
-            }
-            obj.transform.position = Vector3.Lerp(startingPos, spot, (elapsedTime / time));
-            elapsedTime += Time.deltaTime;
-            yield return null;
         }
     }
 
     public void KillNPC(GameObject npc)
     {
-        foreach(GameObject obj in entities)
+        foreach(NPCBehaviour obj in entities)
         {
             //NPC we want to kill
-            if(obj == npc)
+            if(obj.gameObject == npc)
             {
                 entities.Remove(obj);
-                Destroy(obj);
+                Destroy(obj.gameObject);
                 return;
             }
         }

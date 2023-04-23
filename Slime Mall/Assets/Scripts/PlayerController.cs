@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour
             {
                 transform.position = col.gameObject.transform.position;
                 NPCManager.instance.KillNPC(col.gameObject);
+                GameManager.instance.UpdateScore();
                 return;
             }
         }

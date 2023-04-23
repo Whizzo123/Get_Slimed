@@ -53,7 +53,7 @@ public class AudioManager : MonoBehaviour
     };
 
 
-    public static AudioManager existant;
+    public static AudioManager instance;
 
     /// <summary>
     /// Destroys self if duplicate. //Loads all audio files in automatically. 
@@ -63,9 +63,9 @@ public class AudioManager : MonoBehaviour
         //TODO: Load all sfx by file automatically
 
         //Creates a new audiomanager if there isn't one already
-        if (existant == null) 
-        { 
-            existant = this; 
+        if (instance == null) 
+        {
+            instance = this; 
         }
         else 
         { 

@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
 
     [Range(0,360)]
     public float sessionLenght = 120;
-    public float score = 0;
+    public int score = 0;
+    public int killValue = 50;
 
     bool isGamePaused = false;
 
@@ -35,6 +36,12 @@ public class GameManager : MonoBehaviour
             }
             UI.instance.UpdatedTimer(Mathf.FloorToInt(sessionLenght / 60), Mathf.FloorToInt(sessionLenght % 60));
         }
+    }
+
+    public void UpdateScore()
+    {
+        score += killValue;
+        UI.instance.UpdateScore(score);
     }
 
     public void PauseGame()

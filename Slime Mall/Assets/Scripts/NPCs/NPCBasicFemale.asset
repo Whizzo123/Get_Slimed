@@ -15,5 +15,8 @@ MonoBehaviour:
   intScore: 0
   Speed: 5
   radius: 5
+  idleTime: 5
+  wanderTime: 2
   sprite: {fileID: 21300000, guid: f223a357e44f23a41bbfde7b275c1c59, type: 3}
   spriteColour: {r: 1, g: 1, b: 1, a: 1}
+  killed: 0
