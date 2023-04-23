@@ -9,6 +9,8 @@ public class OrderInLayer : MonoBehaviour
     SpriteRenderer sprite;
     [SerializeField]
     bool isSortingUpdating = true;
+    [Range(-10f, 10f)]
+    public int yOffset = 0;
 
     void Awake()
     {
@@ -16,13 +18,13 @@ public class OrderInLayer : MonoBehaviour
         {
             if (TryGetComponent<SpriteRenderer>(out SpriteRenderer SR)) sprite = SR;
         }
-        sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y);
+        sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y + yOffset);
     }
 
     void Update()
     {
         if (isSortingUpdating)
-            sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y);
+            sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y + yOffset);
         else
             DestroyImmediate(this);
     }

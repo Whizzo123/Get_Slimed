@@ -19,6 +19,7 @@ public class UI : MonoBehaviour
     public TextMeshProUGUI progressText;
 
     public TextMeshProUGUI timer;
+    public TextMeshProUGUI score;
 
     void Awake()
     {
@@ -47,6 +48,11 @@ public class UI : MonoBehaviour
     public void UpdatedTimer(float minutes, float seconds)
     {
         timer.SetText(string.Format("{0:00}:{1:00}", minutes, seconds));
+    }
+
+    public void UpdateScore(int sc)
+    {
+        score.SetText(sc.ToString());
     }
 
     public void PlayButton(int index)

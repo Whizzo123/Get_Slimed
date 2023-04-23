@@ -20,6 +20,15 @@ public class PlayerController : MonoBehaviour
     [Range(1f, 100f), Tooltip("Player movement speed")]
     public float moveSpeed = 5f;
 
+    [Header("Inteactions")]
+    public LayerMask interactLayer;
+    [Range(0,5f)]
+    public float interactRadius = 1f;
+
+    public CircleCollider2D checkArea;
+    
+    public bool isVisible = true;
+
     void Awake()
     {
         if (instance == null) instance = this;
@@ -30,12 +39,17 @@ public class PlayerController : MonoBehaviour
         boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
 
+        checkArea.radius = interactRadius;
+
         //Bind movement to an action
         movement = input.Movement.Move;
         movement.Enable();
 
         input.Movement.Interact.performed += DoInteract;
         input.Movement.Interact.Enable();
+
+        input.Movement.Kill.performed += DoKill;
+        input.Movement.Kill.Enable();
 
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
@@ -66,13 +80,36 @@ public class PlayerController : MonoBehaviour
         rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
     }
 
+
     void DoInteract(InputAction.CallbackContext obj)
     {
-       
+        Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+    }
+
+    void DoKill(InputAction.CallbackContext obj)
+    {
+        Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+
+        foreach(Collider2D col in colls)
+        {
+            if(col.CompareTag("Killable"))
+            {
+                transform.position = col.gameObject.transform.position;
+                NPCManager.instance.KillNPC(col.gameObject);
+                GameManager.instance.UpdateScore();
+                return;
+            }
+        }
     }
 
     void DoPause(InputAction.CallbackContext obj)
     {
         GameManager.instance.PauseGame();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, interactRadius);
     }
 }

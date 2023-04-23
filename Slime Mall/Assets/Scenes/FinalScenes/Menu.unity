@@ -383,6 +383,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 185455663387062292, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1179509031697515829, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -397,6 +401,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031697515829, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1179509031727341488, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031795766315, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
@@ -421,6 +429,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509032063011241, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1179509032063011242, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1179509032697251388, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1179509032764524550, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
@@ -545,6 +561,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509033464091182, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8373457133040240391, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
