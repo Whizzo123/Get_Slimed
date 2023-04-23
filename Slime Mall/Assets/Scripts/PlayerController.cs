@@ -71,6 +71,11 @@ public class PlayerController : MonoBehaviour
                 sr.flipX = false;
 
             ProcessInput();
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                InteractWithBin();
+            }
+           
         }
     }
 
@@ -83,7 +88,32 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Vertical", dir.y);
     }
 
+    void InteractWithBin()
+    {
+        //When called once, will go into bin animation. When called again, will exit bin animation.
+        if (!animator.GetBool("Bin"))
+        {
+            animator.SetBool("Bin", true);
+            //Disable movement
+            //Reposition
+            //Disable visible by AI
+        }
+        else
+        {
+            animator.SetBool("Bin", false);
+            //Animation event will call E_ExitedBin() after animation is finished.
+            //Enable Vision by AI
 
+        }
+
+
+    }
+    public void E_ExitedBin()
+    {
+        Debug.Log("Exited Bin Fully");
+        //Enable movement
+        //Reposition
+    }
     void DoInteract(InputAction.CallbackContext obj)
     {
         Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
