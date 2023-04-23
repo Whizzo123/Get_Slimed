@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
     Controls input;
     InputAction movement;
-
+    Animator animator;
     Rigidbody2D rb;
     BoxCollider2D boxCol;
     Vector2 dir;
@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponent<Animator>();
 
         checkArea.radius = interactRadius;
 
@@ -78,6 +79,8 @@ public class PlayerController : MonoBehaviour
         //Movement
         rb.velocity = Vector2.zero;
         rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
+        animator.SetFloat("Horizontal",dir.x);
+        animator.SetFloat("Vertical", dir.y);
     }
 
 
