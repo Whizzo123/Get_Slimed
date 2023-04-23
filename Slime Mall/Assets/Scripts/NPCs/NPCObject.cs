@@ -23,5 +23,7 @@ public class NPCObject : ScriptableObject
     public float radius = 5f;
 
     public Sprite sprite;
-    public Color spriteColour;   
+    public Color spriteColour;
+
+    public bool killed = false;
 }

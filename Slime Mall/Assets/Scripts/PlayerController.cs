@@ -28,12 +28,6 @@ public class PlayerController : MonoBehaviour
     public CircleCollider2D checkArea;
     
     public bool isVisible = true;
-    bool canInteract = false;
-    bool canKill = false;
-
-    List<GameObject> interactibles = new List<GameObject>();
-    //true = looking left
-    bool isFlipped => sr.flipX;
 
     void Awake()
     {
@@ -94,9 +88,16 @@ public class PlayerController : MonoBehaviour
 
     void DoKill(InputAction.CallbackContext obj)
     {
-        if(canKill)
-        {
+        Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
 
+        foreach(Collider2D col in colls)
+        {
+            if(col.CompareTag("Killable"))
+            {
+                transform.position = col.gameObject.transform.position;
+                NPCManager.instance.KillNPC(col.gameObject);
+                return;
+            }
         }
     }
 

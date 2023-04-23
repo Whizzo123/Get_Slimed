@@ -691,6 +691,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 899358288}
   isSortingUpdating: 1
+  yOffset: 0
 --- !u!50 &899358291
 Rigidbody2D:
   serializedVersion: 4
@@ -895,6 +896,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 1122544178}
   isSortingUpdating: 1
+  yOffset: 0
 --- !u!212 &1122544178
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1138,6 +1140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 1434887722}
   isSortingUpdating: 1
+  yOffset: 0
 --- !u!212 &1434887722
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1285,6 +1288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 1787884169}
   isSortingUpdating: 1
+  yOffset: 0
 --- !u!212 &1787884169
 SpriteRenderer:
   m_ObjectHideFlags: 0

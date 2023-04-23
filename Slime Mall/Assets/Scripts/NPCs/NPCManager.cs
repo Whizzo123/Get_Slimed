@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPCManager : MonoBehaviour
@@ -66,15 +67,34 @@ public class NPCManager : MonoBehaviour
     public IEnumerator Move(GameObject obj, float time)
     {
         Vector3 startingPos = obj.transform.position;
-        Vector3 spot = 5*FindLocation() + startingPos;
+        Vector3 spot = 5 * FindLocation() + startingPos;
 
         float elapsedTime = 0;
 
         while (elapsedTime < time)
         {
+            //Was killed while moving
+            if (!obj)
+            {
+                yield break;
+            }
             obj.transform.position = Vector3.Lerp(startingPos, spot, (elapsedTime / time));
             elapsedTime += Time.deltaTime;
             yield return null;
+        }
+    }
+
+    public void KillNPC(GameObject npc)
+    {
+        foreach(GameObject obj in entities)
+        {
+            //NPC we want to kill
+            if(obj == npc)
+            {
+                entities.Remove(obj);
+                Destroy(obj);
+                return;
+            }
         }
     }
 }
