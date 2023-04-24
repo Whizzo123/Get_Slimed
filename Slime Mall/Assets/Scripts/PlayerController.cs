@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour
     
     public bool isVisible = true;
 
+    GameObject binHidingIn;
+    GameObject ventHidingIn;
+    bool isMovementEnabled = true;
+
     void Awake()
     {
         if (instance == null) instance = this;
@@ -71,39 +75,46 @@ public class PlayerController : MonoBehaviour
                 sr.flipX = false;
 
             ProcessInput();
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                InteractWithBin();
-            }
-           
         }
     }
 
     void ProcessInput()
     {
         //Movement
-        rb.velocity = Vector2.zero;
-        rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
-        animator.SetFloat("Horizontal",dir.x);
-        animator.SetFloat("Vertical", dir.y);
+        if (isMovementEnabled)
+        {
+            rb.velocity = Vector2.zero;
+            rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
+            animator.SetFloat("Horizontal", dir.x);
+            animator.SetFloat("Vertical", dir.y);
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
+        }
     }
 
-    void InteractWithBin()
+    void InteractWithBin(GameObject binGameObject)
     {
         //When called once, will go into bin animation. When called again, will exit bin animation.
         if (!animator.GetBool("Bin"))
         {
             animator.SetBool("Bin", true);
+            binHidingIn = binGameObject;
+            binGameObject.GetComponent<SpriteRenderer>().enabled = false;
             //Disable movement
+            isMovementEnabled = false;
             //Reposition
+            Vector3 directionFacingBin = binGameObject.transform.position - transform.position;
+            transform.position = binGameObject.transform.position + (directionFacingBin.normalized) / 4;
             //Disable visible by AI
+            
         }
         else
         {
             animator.SetBool("Bin", false);
             //Animation event will call E_ExitedBin() after animation is finished.
             //Enable Vision by AI
-
         }
 
 
@@ -111,12 +122,78 @@ public class PlayerController : MonoBehaviour
     public void E_ExitedBin()
     {
         Debug.Log("Exited Bin Fully");
+        binHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        binHidingIn = null;
         //Enable movement
+        isMovementEnabled = true;
         //Reposition
     }
+
+    public void InteractWithVent(GameObject ventGameObject)
+    {
+        //When called once, will go into vent animation. When called again, will exit vent animation.
+        if (!animator.GetBool("Vent"))
+        {
+            animator.SetBool("Vent", true);
+            binHidingIn = ventGameObject;
+            ventGameObject.GetComponent<SpriteRenderer>().enabled = false;
+            //Disable movement
+            isMovementEnabled = false;
+            //Reposition
+            Vector3 directionFacingBin = ventGameObject.transform.position - transform.position;
+            transform.position = ventGameObject.transform.position + (directionFacingBin.normalized) / 4;
+            //Disable visible by AI
+
+        }
+        else
+        {
+            animator.SetBool("Vent", false);
+            //Animation event will call E_ExitedVent() after animation is finished.
+            //Enable Vision by AI
+        }
+    }
+
+    public void E_ExitedVent()
+    {
+        Debug.Log("Exited Vent Fully");
+        ventHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        ventHidingIn = null;
+        //Enable movement
+        isMovementEnabled = true;
+        //Reposition
+    }
+
     void DoInteract(InputAction.CallbackContext obj)
     {
-        Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+        Debug.Log("Do interact");
+        if (binHidingIn)
+        {
+            InteractWithBin(null);
+            return;
+        }
+        else if (ventHidingIn)
+        {
+            InteractWithVent(null);
+            return;
+        }
+        else
+        {
+            Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+            foreach (Collider2D collider in colls)
+            {
+                // Are we within the radius of interacting with the bin?
+                if (collider.GetComponent<Bin>() != null)
+                {
+                    InteractWithBin(collider.gameObject);
+                    return;
+                }
+                else if(collider.GetComponent<Vent>() != null)
+                {
+                    InteractWithVent(collider.gameObject);
+                    return;
+                }
+            }
+        }
     }
 
     void DoKill(InputAction.CallbackContext obj)
