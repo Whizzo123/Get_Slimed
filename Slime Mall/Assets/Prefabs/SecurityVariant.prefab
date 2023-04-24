@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4357240078412068522}
   - component: {fileID: 7218592668470407217}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Prompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 6133829854517618032}
   - component: {fileID: 8639479647760402006}
   - component: {fileID: 942009254833054778}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,7 +271,8 @@ GameObject:
   - component: {fileID: 8380599669030006150}
   - component: {fileID: 3385881251334051852}
   - component: {fileID: 3878577871780699917}
-  m_Layer: 3
+  - component: {fileID: 4214520096816970703}
+  m_Layer: 6
   m_Name: SecurityVariant
   m_TagString: Killable
   m_Icon: {fileID: 0}
@@ -426,3 +427,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 241f6b87f2bd8074483b58257eec0c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4214520096816970703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7226305476576412004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d446bb44a01a6c4b97d72c1d4b11d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seeableObjectsLayer:
+    serializedVersion: 2
+    m_Bits: 64

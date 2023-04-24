@@ -14,6 +14,7 @@ public class NPCBehaviour : MonoBehaviour
     protected Rigidbody2D rb;
     protected SpriteRenderer sr;
     protected Animator animator;
+    protected NPCSightComponent sight;
     protected Vector2 dir;
 
     protected float idleTime;
@@ -21,12 +22,13 @@ public class NPCBehaviour : MonoBehaviour
     protected float lastStep;
 
     protected StateMachine myState = StateMachine.IDLE;
-
+    protected GameObject spottedSlime;
     protected bool lookingLeft => sr.flipX;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        sight = GetComponent<NPCSightComponent>();
         animator = GetComponent<Animator>();
         lastStep = Time.time;
     }
@@ -44,6 +46,7 @@ public class NPCBehaviour : MonoBehaviour
         offset = Random.Range(wanderTime, wanderTime + 5);
         wanderTime = settings.wanderTime + offset;
         animator.runtimeAnimatorController = settings.animator;
+        sight.SetSightRadius(settings.radius);
     }
 
     void Update()
@@ -74,8 +77,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.WANDER:
-                rb.velocity = Vector2.zero;
-                rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
+                MoveNPC(dir);
                 if (Time.time >= lastStep + wanderTime)
                 {
                     dir = Vector2.zero;
@@ -104,5 +106,17 @@ public class NPCBehaviour : MonoBehaviour
     {
         myState = state;
         lastStep = Time.time;
+    }
+
+    protected void MoveNPC(Vector2 dir)
+    {
+        rb.velocity = Vector2.zero;
+        rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
+    }
+
+    protected bool CheckForSlime()
+    {
+        spottedSlime = sight.PollForSeenObjectOfType<PlayerController>();
+        return spottedSlime != null && spottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false;
     }
 }
