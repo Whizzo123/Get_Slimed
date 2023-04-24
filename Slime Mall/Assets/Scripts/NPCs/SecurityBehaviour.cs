@@ -16,6 +16,7 @@ public class SecurityBehaviour : NPCBehaviour
             case StateMachine.IDLE:
                 if (CheckForSlime() == true)
                 {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
                     ChangeState(StateMachine.CHASE);
                 }
                 //Idle enough
@@ -30,6 +31,7 @@ public class SecurityBehaviour : NPCBehaviour
                 MoveNPC(dir);
                 if(CheckForSlime() == true)
                 {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
                     ChangeState(StateMachine.CHASE);
                 }
                 else if (Time.time >= lastStep + wanderTime)
@@ -49,7 +51,9 @@ public class SecurityBehaviour : NPCBehaviour
                 }
                 else
                 {
-                    ChangeState(StateMachine.WANDER);
+                    GetComponent<ActivatePrompt>().HideEmotion();
+                    ChangeState(StateMachine.IDLE);
+                    rb.velocity = Vector2.zero;
                 }
                 break;
         }

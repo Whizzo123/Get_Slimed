@@ -56,7 +56,11 @@ public class NPCBehaviour : MonoBehaviour
             sr.flipX = true;
         else if (dir.x > 0)
             sr.flipX = false;
-        if (dir != Vector2.zero)
+        if (dir == Vector2.zero)
+        {
+            sight.UpdateSight(new Vector2(-1, 0));
+        }
+        else
         {
             sight.UpdateSight(dir);
         }
@@ -103,7 +107,8 @@ public class NPCBehaviour : MonoBehaviour
                 ChangeState(StateMachine.ESCAPE);
                 break;
             case StateMachine.ESCAPE:
-                if (CheckForSlime() == false)
+                const float runawayThresholdDistance = 7.5f;
+                if (Vector2.Distance(spottedSlime.transform.position, this.transform.position) >= runawayThresholdDistance)
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();
                     ChangeState(StateMachine.IDLE);
