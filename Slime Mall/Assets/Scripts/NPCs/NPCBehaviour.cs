@@ -56,7 +56,10 @@ public class NPCBehaviour : MonoBehaviour
             sr.flipX = true;
         else if (dir.x > 0)
             sr.flipX = false;
-
+        if (dir != Vector2.zero)
+        {
+            sight.UpdateSight(dir);
+        }
         UpdateStateMachine();
 
         animator.SetFloat("Horizontal", rb.velocity.normalized.x);
@@ -69,7 +72,12 @@ public class NPCBehaviour : MonoBehaviour
         {
             case StateMachine.IDLE:
                 //Idle enough
-                if (Time.time >= lastStep + idleTime)
+                if(CheckForSlime() == true)
+                {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
+                    ChangeState(StateMachine.SIGHT);
+                }
+                else if (Time.time >= lastStep + idleTime)
                 {
                     dir = FindDirection();
                     ChangeState(StateMachine.WANDER);
@@ -78,6 +86,11 @@ public class NPCBehaviour : MonoBehaviour
 
             case StateMachine.WANDER:
                 MoveNPC(dir);
+                if(CheckForSlime() == true)
+                {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
+                    ChangeState(StateMachine.SIGHT);
+                }
                 if (Time.time >= lastStep + wanderTime)
                 {
                     dir = Vector2.zero;
@@ -87,11 +100,19 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.SIGHT:
-                // Enter the chase state
+                ChangeState(StateMachine.ESCAPE);
                 break;
-
-            case StateMachine.CHASE:
-                // Run towards slime at full speed
+            case StateMachine.ESCAPE:
+                if (CheckForSlime() == false)
+                {
+                    GetComponent<ActivatePrompt>().HideEmotion();
+                    ChangeState(StateMachine.IDLE);
+                }
+                else
+                {
+                    dir = (transform.position - spottedSlime.transform.position).normalized;
+                    MoveNPC(dir);
+                }
                 break;
         }
     }
@@ -99,7 +120,7 @@ public class NPCBehaviour : MonoBehaviour
     public Vector2 FindDirection()
     {
         Vector2 target = rb.position + Random.insideUnitCircle * radius;
-        return target.normalized - rb.position.normalized;
+        return (target - rb.position).normalized;
     }
 
     protected void ChangeState(StateMachine state)
