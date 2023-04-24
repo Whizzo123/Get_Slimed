@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using System;
+
 public class UIAnim_HighScoreScreen : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text Score, HighScore;
     [SerializeField] private GameObject[] BounceObjects;
 
     [SerializeField] private float ScaleTime;
-
     public void SetData(int ScoreNumber, int HighScoreNumber)
     {
         
@@ -26,6 +27,7 @@ public class UIAnim_HighScoreScreen : MonoBehaviour
             BounceObjects[i].transform.localScale = new Vector3(0, 0);
             LeanTween.scale(BounceObjects[i].gameObject, SavedScale, ScaleTime).setDelay(0.1f).setEase(LeanTweenType.easeOutElastic);
         }
+        Invoke("PlayLose", 1.0f);
     }
     public void ExitGame()
     {
@@ -34,5 +36,9 @@ public class UIAnim_HighScoreScreen : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene(0);
+    }
+    void PlayLose()
+    {
+        AudioManager.instance.PlaySoundFull("Lose");
     }
 }
