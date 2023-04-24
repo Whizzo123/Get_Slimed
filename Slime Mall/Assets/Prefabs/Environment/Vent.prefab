@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7434411360764957852}
   - component: {fileID: 13436104897880376}
   - component: {fileID: 8511724151492505207}
+  - component: {fileID: 1106162437257129092}
   m_Layer: 3
   m_Name: Vent
   m_TagString: Untagged
@@ -124,3 +125,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1106162437257129092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8620291007941797911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19734f748f0070c459b301adb38e4a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 7434411360764957852}
+  isSortingUpdating: 1
+  yOffset: 0
