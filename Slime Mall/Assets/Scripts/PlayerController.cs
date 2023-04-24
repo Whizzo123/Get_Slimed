@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour
     InputAction movement;
     Animator animator;
     Rigidbody2D rb;
-    BoxCollider2D boxCol;
     Vector2 dir;
 
     SpriteRenderer sr;
@@ -40,7 +39,6 @@ public class PlayerController : MonoBehaviour
 
         input = new Controls();
         rb = GetComponent<Rigidbody2D>();
-        boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
@@ -120,6 +118,7 @@ public class PlayerController : MonoBehaviour
 
 
     }
+
     public void E_ExitedBin()
     {
         Debug.Log("Exited Bin Fully");

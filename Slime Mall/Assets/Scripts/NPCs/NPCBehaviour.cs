@@ -67,7 +67,7 @@ public class NPCBehaviour : MonoBehaviour
 
             case StateMachine.WANDER:
                 rb.velocity = Vector2.zero;
-                rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
+                rb.velocity += new Vector2(dir.x, dir.y) * speed * 100 * Time.deltaTime;
                 if (Time.time >= lastStep + wanderTime)
                 {
                     dir = Vector2.zero;
