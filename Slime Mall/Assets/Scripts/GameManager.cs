@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
     [Range(0,360)]
     public float sessionLenght = 120;
     public int score = 0;
-    public int killValue = 50;
+    public int hiscore = 0;
+    public int killValue = 10;
 
     bool isGamePaused = false;
 
@@ -32,6 +33,8 @@ public class GameManager : MonoBehaviour
             sessionLenght -= Time.deltaTime;
             if(sessionLenght <= 0 ) 
             {
+                isGamePaused = true;
+
                 EndGame();
             }
             UI.instance.UpdatedTimer(Mathf.FloorToInt(sessionLenght / 60), Mathf.FloorToInt(sessionLenght % 60));
@@ -60,7 +63,14 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
-
+        if(score > hiscore)
+        {
+            hiscore = score;
+        }
+        //Disable player movement
+        FindObjectOfType<PlayerController>().FreezePlayer();
+        //Load in end screen ui
+        UI.instance.TimeOutEnd(score, hiscore);
     }
 
     public void LoadLevel(int index)
