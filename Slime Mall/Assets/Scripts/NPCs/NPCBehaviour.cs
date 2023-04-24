@@ -6,23 +6,23 @@ public class NPCBehaviour : MonoBehaviour
 {
     public enum StateMachine
     {
-        IDLE, WANDER, SIGHT, ESCAPE
+        IDLE, WANDER, SIGHT, ESCAPE, CHASE
     }
-    float speed;
-    float radius;
+    protected float speed;
+    protected float radius;
 
-    Rigidbody2D rb;
-    SpriteRenderer sr;
-    Animator animator;
-    Vector2 dir;
+    protected Rigidbody2D rb;
+    protected SpriteRenderer sr;
+    protected Animator animator;
+    protected Vector2 dir;
 
-    float idleTime;
-    float wanderTime;
-    float lastStep;
+    protected float idleTime;
+    protected float wanderTime;
+    protected float lastStep;
 
-    StateMachine myState = StateMachine.IDLE;
+    protected StateMachine myState = StateMachine.IDLE;
 
-    bool lookingLeft => sr.flipX;
+    protected bool lookingLeft => sr.flipX;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -54,11 +54,19 @@ public class NPCBehaviour : MonoBehaviour
         else if (dir.x > 0)
             sr.flipX = false;
 
+        UpdateStateMachine();
+
+        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
+        animator.SetFloat("Vertical", rb.velocity.normalized.y);
+    }
+
+    public virtual void UpdateStateMachine()
+    {
         switch (myState)
         {
             case StateMachine.IDLE:
                 //Idle enough
-                if(Time.time >= lastStep + idleTime)
+                if (Time.time >= lastStep + idleTime)
                 {
                     dir = FindDirection();
                     ChangeState(StateMachine.WANDER);
@@ -77,16 +85,13 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.SIGHT:
-                //Get scared
-                //Call guards
+                // Enter the chase state
                 break;
 
-            case StateMachine.ESCAPE:
-                //Run opposite of slime at increased speed
+            case StateMachine.CHASE:
+                // Run towards slime at full speed
                 break;
         }
-        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
-        animator.SetFloat("Vertical", rb.velocity.normalized.y);
     }
 
     public Vector2 FindDirection()
@@ -95,7 +100,7 @@ public class NPCBehaviour : MonoBehaviour
         return target.normalized - rb.position.normalized;
     }
 
-    void ChangeState(StateMachine state)
+    protected void ChangeState(StateMachine state)
     {
         myState = state;
         lastStep = Time.time;

@@ -222,6 +222,11 @@ public class PlayerController : MonoBehaviour
         GameManager.instance.PauseGame();
     }
 
+    public bool IsSlimeHidden()
+    {
+        return binHidingIn || ventHidingIn;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

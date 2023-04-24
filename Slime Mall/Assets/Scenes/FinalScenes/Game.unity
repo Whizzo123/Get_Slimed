@@ -1435,7 +1435,8 @@ MonoBehaviour:
     amount: 5
   - npc: {fileID: 11400000, guid: 2f8931cb4317e8145b153add6395c5db, type: 2}
     amount: 2
-  NPCPrefab: {fileID: 8817888258833637102, guid: 29dd129ec6090404298809bce1114abc, type: 3}
+  - npc: {fileID: 11400000, guid: 318acffe0f77b0b448d58e7013fd0062, type: 2}
+    amount: 2
   NPCMoveSpeed: 1
 --- !u!4 &2081708183
 Transform:

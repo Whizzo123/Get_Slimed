@@ -17,8 +17,6 @@ public class NPCManager : MonoBehaviour
     public List<NPC> NPCList;
     List<NPCBehaviour> entities = new List<NPCBehaviour>();
 
-    public GameObject NPCPrefab;
-
     [Range(0f, 2f)]
     public float NPCMoveSpeed = 1;
 
@@ -35,7 +33,7 @@ public class NPCManager : MonoBehaviour
         {           
             for (int j = 0; j < NPCList[i].amount; j++)
             {
-                GameObject temp = Instantiate(NPCPrefab, new Vector3(Random.insideUnitCircle.x * 5, Random.insideUnitCircle.y * 5, 0), Quaternion.identity, transform);
+                GameObject temp = Instantiate(NPCList[i].npc.npcPrefab, new Vector3(Random.insideUnitCircle.x * 5, Random.insideUnitCircle.y * 5, 0), Quaternion.identity, transform);
                 temp.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].npc);
                 entities.Add(temp.GetComponent<NPCBehaviour>());
             }

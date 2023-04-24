@@ -25,6 +25,6 @@ public class NPCObject : ScriptableObject
     public Sprite sprite;
     public Color spriteColour;
     public AnimatorOverrideController animator;
-
+    public GameObject npcPrefab;
     public bool killed = false;
 }
