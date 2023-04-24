@@ -124,7 +124,7 @@ public class NPCBehaviour : MonoBehaviour
 
     public Vector2 FindDirection()
     {
-        Vector2 target = rb.position + Random.insideUnitCircle * radius;
+        Vector2 target = NPCManager.instance.FindPointForMyZone(this);
         return (target - rb.position).normalized;
     }
 
