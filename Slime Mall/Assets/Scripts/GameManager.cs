@@ -63,6 +63,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void CapturedEndGame()
+    {
+
+    }
+
     public void LoadLevel(int index)
     {
         StartCoroutine(LoadLevelAsync(index));

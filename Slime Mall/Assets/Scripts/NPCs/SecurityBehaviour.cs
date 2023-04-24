@@ -54,5 +54,14 @@ public class SecurityBehaviour : NPCBehaviour
                 break;
         }
     }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.GetComponent<PlayerController>())
+        {
+            //Send off a call to game manager
+            GameManager.instance.CapturedEndGame();
+        }
+    }
 }
 
