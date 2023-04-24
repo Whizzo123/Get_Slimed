@@ -17,7 +17,6 @@ public class SecurityBehaviour : NPCBehaviour
                 if (CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
-                    speed += 2.5f;
                     ChangeState(StateMachine.SIGHT);
                 }
                 //Idle enough
@@ -33,7 +32,6 @@ public class SecurityBehaviour : NPCBehaviour
                 if(CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
-                    speed += 2.5f;
                     ChangeState(StateMachine.SIGHT);
                 }
                 else if (Time.time >= lastStep + wanderTime)
@@ -44,6 +42,7 @@ public class SecurityBehaviour : NPCBehaviour
                 }
                 break;
             case StateMachine.SIGHT:
+                    speed = 9.5f;
                 AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
                 ChangeState(StateMachine.CHASE);
 
@@ -58,7 +57,7 @@ public class SecurityBehaviour : NPCBehaviour
                 else
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();
-                    speed -= 2.5f;
+                    speed = 5.0f;
                     ChangeState(StateMachine.IDLE);
                     rb.velocity = Vector2.zero;
                 }

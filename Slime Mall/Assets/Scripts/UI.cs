@@ -18,6 +18,9 @@ public class UI : MonoBehaviour
     public GameObject capturedScreen;
     public GameObject timeOutScreen;
 
+    public Image sprintBar;
+    public float sprintAmount = 3.0f;
+
 
     public GameObject loadingScreen;
     public Slider slider;
@@ -104,5 +107,11 @@ public class UI : MonoBehaviour
         timeOutScreen.SetActive(true);
         timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
         timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
+    }
+
+    public void ChangeSprintBar(float amount)
+    {
+        sprintAmount = amount;
+        sprintBar.fillAmount = sprintAmount / 3.0f;
     }
 }

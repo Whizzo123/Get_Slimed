@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     [Header("Move")]
     [Range(1f, 100f), Tooltip("Player movement speed")]
     public float moveSpeed = 5f;
+    public float sprintSpeed = 15.0f;
+    public float sprintDelay = 2.0f;
+    private float originalSprintDelay;
+    private float originalMovespeed;
 
     [Header("Inteactions")]
     public LayerMask interactLayer;
@@ -33,6 +37,8 @@ public class PlayerController : MonoBehaviour
     GameObject binHidingIn;
     GameObject ventHidingIn;
     bool isMovementEnabled = true;
+
+    float speedJuice = 3;
 
     void Awake()
     {
@@ -60,6 +66,9 @@ public class PlayerController : MonoBehaviour
 
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
+
+        originalMovespeed = moveSpeed;
+        originalSprintDelay = sprintDelay;
     }
 
     // Update is called once per frame
@@ -69,7 +78,36 @@ public class PlayerController : MonoBehaviour
         {
             //Get dir
             dir = movement.ReadValue<Vector2>();
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                sprintDelay = originalSprintDelay;
+                speedJuice -= Time.deltaTime;
+                if (speedJuice <= 0)
+                {
+                    moveSpeed = originalMovespeed;
+                    speedJuice = 0;
+                }
+                else
+                {
+                    moveSpeed = sprintSpeed;
+                }
+            }
+            else
+            {
 
+                sprintDelay -= Time.deltaTime;
+                if (sprintDelay <= 0)
+                {
+                    speedJuice += Time.deltaTime;
+                    if (speedJuice >= 3)
+                    {
+                        speedJuice = 3;
+                    }
+                }
+
+                 moveSpeed = originalMovespeed;
+            }
+            UI.instance.ChangeSprintBar(speedJuice);
             //Flip sprite based on dir
             if (dir.x < 0)
                 sr.flipX = true;
@@ -77,6 +115,7 @@ public class PlayerController : MonoBehaviour
                 sr.flipX = false;
 
             ProcessInput();
+
         }
     }
 

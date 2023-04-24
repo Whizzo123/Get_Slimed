@@ -42,7 +42,7 @@ public class NPCManager : MonoBehaviour
         {           
             for (int j = 0; j < NPCList[i].amount; j++)
             {
-                int spawnZone = Random.Range(0, 3);
+                int spawnZone = Random.Range(0, spawnAreas.Length);
                 float spawnPointX = Random.Range(spawnAreas[spawnZone].bounds.min.x, spawnAreas[spawnZone].bounds.max.x);
                 float spawnPointY = Random.Range(spawnAreas[spawnZone].bounds.min.y, spawnAreas[spawnZone].bounds.max.y);
                 GameObject temp = Instantiate(NPCList[i].npc.npcPrefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity, transform);
