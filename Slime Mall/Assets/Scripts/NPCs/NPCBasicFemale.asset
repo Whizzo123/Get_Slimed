@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NPCBasicFemale
   m_EditorClassIdentifier: 
   intScore: 0
-  Speed: 5
+  Speed: 2
   radius: 2
   idleTime: 5
   wanderTime: 2

@@ -42,7 +42,7 @@ public class SecurityBehaviour : NPCBehaviour
                 }
                 break;
             case StateMachine.SIGHT:
-                    speed = 9.5f;
+                    speed = 5.0f;
                 AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
                 ChangeState(StateMachine.CHASE);
 
@@ -57,7 +57,7 @@ public class SecurityBehaviour : NPCBehaviour
                 else
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();
-                    speed = 5.0f;
+                    speed = 2.0f;
                     ChangeState(StateMachine.IDLE);
                     rb.velocity = Vector2.zero;
                 }

@@ -82,8 +82,8 @@ public class NPCBehaviour : MonoBehaviour
         {
             case StateMachine.IDLE:
                 //Idle enough
-                    speed = 10f;
-                if(CheckForSlime() == true)
+                    speed = 1.5f;
+                if (CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
                     ChangeState(StateMachine.SIGHT);
@@ -96,7 +96,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.WANDER:
-                    speed = 10f;
+                    speed = 1.5f;
                 MoveNPC(dir);
                 if (CheckForSlime() == true)
                 {
@@ -117,7 +117,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
             case StateMachine.ESCAPE:
                 const float runawayThresholdDistance = 7.5f;
-                    speed = 20;
+                    speed = 4;
                 if (Vector2.Distance(spottedSlime.transform.position, this.transform.position) >= runawayThresholdDistance)
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();
