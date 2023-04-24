@@ -11,7 +11,7 @@ public class NPCSightComponent : MonoBehaviour
     List<GameObject> seenGameObjects;
 
     public LayerMask seeableObjectsLayer;
-    private float TimeToWaitToSee = 2.0f;
+    private float TimeToWaitToSee = 1.0f;
     private float CurrentWaitingTimeToSee = 0.0f;
     private Vector3 debugWireSpherePosition = Vector3.zero;
 
@@ -42,11 +42,14 @@ public class NPCSightComponent : MonoBehaviour
     {
         foreach(GameObject seenObject in seenGameObjects)
         {
-            T component;
-            seenObject.TryGetComponent<T>(out component);
-            if(component != null)
+            if (seenObject != null)
             {
-                return seenObject;
+                T component;
+                seenObject.TryGetComponent<T>(out component);
+                if (component != null)
+                {
+                    return seenObject;
+                }
             }
         }
         return null;
@@ -56,7 +59,7 @@ public class NPCSightComponent : MonoBehaviour
     {
         seenGameObjects.Clear();
         // Use Physics2D.overlap all
-        debugWireSpherePosition = transform.position + (facingDirection * (sightRadius));
+        debugWireSpherePosition = transform.position + (facingDirection * (sightRadius - 0.5f));
         Collider2D[] collisions = Physics2D.OverlapCircleAll(debugWireSpherePosition, sightRadius, seeableObjectsLayer);
         // Any new objects add them to the list of seen things
         foreach(Collider2D seenObject in collisions)

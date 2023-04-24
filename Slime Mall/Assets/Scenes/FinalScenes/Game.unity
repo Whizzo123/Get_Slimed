@@ -6583,7 +6583,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NPCList:
   - npc: {fileID: 11400000, guid: 318acffe0f77b0b448d58e7013fd0062, type: 2}
-    amount: 2
+    amount: 10
   - npc: {fileID: 11400000, guid: 6e44f82e48e299149bd52acb7e2df3c9, type: 2}
     amount: 2
   - npc: {fileID: 11400000, guid: 2f8931cb4317e8145b153add6395c5db, type: 2}
