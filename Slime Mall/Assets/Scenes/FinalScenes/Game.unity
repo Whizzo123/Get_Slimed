@@ -483,7 +483,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031697515829, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -369.18625
+      value: -369.18628
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031727341488, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_IsActive
@@ -503,7 +503,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031795766315, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -263.70456
+      value: -263.7046
       objectReference: {fileID: 0}
     - target: {fileID: 1179509032063011242, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_IsActive
@@ -1480,7 +1480,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 843359583645893477, guid: c654823223170c046b058712c5beecdf, type: 3}
       propertyPath: sessionLenght
-      value: 3.8
+      value: 79
       objectReference: {fileID: 0}
     - target: {fileID: 843359583645893478, guid: c654823223170c046b058712c5beecdf, type: 3}
       propertyPath: m_RootOrder
@@ -1690,7 +1690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NPCList:
   - npc: {fileID: 11400000, guid: 318acffe0f77b0b448d58e7013fd0062, type: 2}
-    amount: 2
+    amount: 10
   - npc: {fileID: 11400000, guid: 6e44f82e48e299149bd52acb7e2df3c9, type: 2}
     amount: 2
   - npc: {fileID: 11400000, guid: 2f8931cb4317e8145b153add6395c5db, type: 2}

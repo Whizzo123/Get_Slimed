@@ -40,6 +40,20 @@ public class NPCManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if(entities.Count < 14)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                int npcIndex = Random.Range(1, 2);
+                GameObject temp = Instantiate(NPCList[npcIndex].npc.npcPrefab, new Vector3(Random.insideUnitCircle.x * 5, Random.insideUnitCircle.y * 5, 0), Quaternion.identity, transform);
+                temp.GetComponent<NPCBehaviour>().GetSettings(NPCList[npcIndex].npc);
+                entities.Add(temp.GetComponent<NPCBehaviour>());
+            }
+        }
+    }
+
     public void KillNPC(GameObject npc)
     {
         foreach(NPCBehaviour obj in entities)
