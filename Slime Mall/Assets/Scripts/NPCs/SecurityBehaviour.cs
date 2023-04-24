@@ -14,8 +14,12 @@ public class SecurityBehaviour : NPCBehaviour
         switch (myState)
         {
             case StateMachine.IDLE:
+                if (CheckForSlime() == true)
+                {
+                    ChangeState(StateMachine.CHASE);
+                }
                 //Idle enough
-                if (Time.time >= lastStep + idleTime)
+                else if (Time.time >= lastStep + idleTime)
                 {
                     dir = FindDirection();
                     ChangeState(StateMachine.WANDER);
@@ -23,9 +27,12 @@ public class SecurityBehaviour : NPCBehaviour
                 break;
 
             case StateMachine.WANDER:
-                rb.velocity = Vector2.zero;
-                rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
-                if (Time.time >= lastStep + wanderTime)
+                MoveNPC(dir);
+                if(CheckForSlime() == true)
+                {
+                    ChangeState(StateMachine.CHASE);
+                }
+                else if (Time.time >= lastStep + wanderTime)
                 {
                     dir = Vector2.zero;
                     rb.velocity = Vector2.zero;
@@ -33,13 +40,17 @@ public class SecurityBehaviour : NPCBehaviour
                 }
                 break;
 
-            case StateMachine.SIGHT:
-                //Get scared
-                //Call guards
-                break;
-
-            case StateMachine.ESCAPE:
-                //Run opposite of slime at increased speed
+            case StateMachine.CHASE:
+                // Have we seen the slime and is he not hidden
+                if(CheckForSlime() == true)
+                {
+                    dir = (spottedSlime.transform.position - transform.position).normalized;
+                    MoveNPC(dir);
+                }
+                else
+                {
+                    ChangeState(StateMachine.WANDER);
+                }
                 break;
         }
     }
