@@ -17,6 +17,7 @@ public class SecurityBehaviour : NPCBehaviour
                 if (CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
+                    speed += 3.0f;
                     ChangeState(StateMachine.CHASE);
                 }
                 //Idle enough
@@ -32,6 +33,7 @@ public class SecurityBehaviour : NPCBehaviour
                 if(CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
+                    speed += 3.0f;
                     ChangeState(StateMachine.CHASE);
                 }
                 else if (Time.time >= lastStep + wanderTime)
@@ -52,6 +54,7 @@ public class SecurityBehaviour : NPCBehaviour
                 else
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();
+                    speed -= 3.0f;
                     ChangeState(StateMachine.IDLE);
                     rb.velocity = Vector2.zero;
                 }
