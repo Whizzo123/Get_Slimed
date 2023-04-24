@@ -99,11 +99,12 @@ public class PlayerController : MonoBehaviour
         //When called once, will go into bin animation. When called again, will exit bin animation.
         if (!animator.GetBool("Bin"))
         {
+            animator.SetTrigger("EnterBin");
             animator.SetBool("Bin", true);
             binHidingIn = binGameObject;
             binGameObject.GetComponent<SpriteRenderer>().enabled = false;
             //Disable movement
-            isMovementEnabled = false;
+            FreezePlayer();
             //Reposition
             Vector3 directionFacingBin = binGameObject.transform.position - transform.position;
             transform.position = binGameObject.transform.position + (directionFacingBin.normalized) / 4;
@@ -122,23 +123,25 @@ public class PlayerController : MonoBehaviour
     public void E_ExitedBin()
     {
         Debug.Log("Exited Bin Fully");
-        binHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+            binHidingIn.GetComponent<SpriteRenderer>().enabled = true;
         binHidingIn = null;
         //Enable movement
-        isMovementEnabled = true;
+        UnFreezePlayer();
         //Reposition
     }
 
     public void InteractWithVent(GameObject ventGameObject)
     {
+        Debug.Log("Interact with vent");
         //When called once, will go into vent animation. When called again, will exit vent animation.
         if (!animator.GetBool("Vent"))
         {
+            animator.SetTrigger("EnterVent");
             animator.SetBool("Vent", true);
-            binHidingIn = ventGameObject;
+            ventHidingIn = ventGameObject;
             ventGameObject.GetComponent<SpriteRenderer>().enabled = false;
             //Disable movement
-            isMovementEnabled = false;
+            FreezePlayer();
             //Reposition
             Vector3 directionFacingBin = ventGameObject.transform.position - transform.position;
             transform.position = ventGameObject.transform.position + (directionFacingBin.normalized) / 4;
@@ -159,7 +162,7 @@ public class PlayerController : MonoBehaviour
         ventHidingIn.GetComponent<SpriteRenderer>().enabled = true;
         ventHidingIn = null;
         //Enable movement
-        isMovementEnabled = true;
+        UnFreezePlayer();
         //Reposition
     }
 
@@ -223,5 +226,17 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactRadius);
+    }
+
+    private void FreezePlayer()
+    {
+        isMovementEnabled = false;
+        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
+    }
+
+    private void UnFreezePlayer()
+    {
+        isMovementEnabled = true;
+        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 }

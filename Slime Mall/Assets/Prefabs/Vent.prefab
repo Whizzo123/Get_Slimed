@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7434411360764957852}
   - component: {fileID: 13436104897880376}
   - component: {fileID: 8511724151492505207}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Vent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
