@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
+
+        hiscore = PlayerPrefs.GetInt("HiScore");
+
     }
 
     void Start()
@@ -66,6 +69,7 @@ public class GameManager : MonoBehaviour
         if(score > hiscore)
         {
             hiscore = score;
+            PlayerPrefs.SetInt("HiScore", hiscore);
         }
         //Disable player movement
         FindObjectOfType<PlayerController>().FreezePlayer();
@@ -75,6 +79,15 @@ public class GameManager : MonoBehaviour
 
     public void CapturedEndGame()
     {
+        if (score > hiscore)
+        {
+            hiscore = score;
+            PlayerPrefs.SetInt("HiScore", hiscore);
+        }
+        //Disable player movement
+        FindObjectOfType<PlayerController>().FreezePlayer();
+        //Load in end screen ui
+        UI.instance.CapturedEnd(score, hiscore);
 
     }
 
