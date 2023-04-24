@@ -6,6 +6,7 @@ public class ActivatePrompt : MonoBehaviour
 {
     public GameObject prompt;
     public GameObject emotionResponse;
+    public bool onlyEmotion;
 
     private float TimeToShowEmotion = 6.0f;
     private float CurrentTimeShowingEmotion = 0.0f;
@@ -33,22 +34,22 @@ public class ActivatePrompt : MonoBehaviour
 
     private void Update()
     {
-        if(emotionResponse.activeSelf == true)
-        {
-            if(CurrentTimeShowingEmotion > TimeToShowEmotion)
-            {
-                emotionResponse.SetActive(false);
-            }
-            else
-            {
-                CurrentTimeShowingEmotion += Time.deltaTime;
-            }
-        }
+        //if(emotionResponse.activeSelf == true)
+        //{
+        //    if(CurrentTimeShowingEmotion > TimeToShowEmotion)
+        //    {
+        //        emotionResponse.SetActive(false);
+        //    }
+        //    else
+        //    {
+        //        CurrentTimeShowingEmotion += Time.deltaTime;
+        //    }
+        //}
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (emotionResponse.activeSelf == false)
+        if (emotionResponse.activeSelf == false && onlyEmotion == false)
         {
             if (col.CompareTag("PlayerArea"))
             {
@@ -59,7 +60,7 @@ public class ActivatePrompt : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D col)
     {
-        if (emotionResponse.activeSelf == false)
+        if (emotionResponse.activeSelf == false && onlyEmotion == false)
         {
             if (col.CompareTag("PlayerArea"))
             {
