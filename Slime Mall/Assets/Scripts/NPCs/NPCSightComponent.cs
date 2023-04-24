@@ -13,17 +13,18 @@ public class NPCSightComponent : MonoBehaviour
     public LayerMask seeableObjectsLayer;
     private float TimeToWaitToSee = 2.0f;
     private float CurrentWaitingTimeToSee = 0.0f;
+    private Vector3 debugWireSpherePosition = Vector3.zero;
 
     private void Start()
     {
         seenGameObjects = new List<GameObject>();
     }
 
-    private void Update()
+    public void UpdateSight(Vector2 dir)
     {
         if(CurrentWaitingTimeToSee >= TimeToWaitToSee)
         {
-            ScanSurroundings();
+            ScanSurroundings(dir);
             CurrentWaitingTimeToSee = 0.0f;
         }
         else
@@ -51,11 +52,12 @@ public class NPCSightComponent : MonoBehaviour
         return null;
     }
 
-    private void ScanSurroundings()
+    private void ScanSurroundings(Vector3 facingDirection)
     {
         seenGameObjects.Clear();
         // Use Physics2D.overlap all
-        Collider2D[] collisions = Physics2D.OverlapCircleAll(transform.position, sightRadius, seeableObjectsLayer);
+        debugWireSpherePosition = transform.position + (facingDirection * (sightRadius));
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(debugWireSpherePosition, sightRadius, seeableObjectsLayer);
         // Any new objects add them to the list of seen things
         foreach(Collider2D seenObject in collisions)
         {
@@ -66,7 +68,7 @@ public class NPCSightComponent : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(255, 0, 200);
-        Gizmos.DrawWireSphere(transform.position, sightRadius);
+        Gizmos.DrawWireSphere(debugWireSpherePosition, sightRadius);
     }
 }
 
