@@ -140,6 +140,17 @@ public class AudioManager : MonoBehaviour
             AudioClip.Source.Play();
         }
     }
+    public void PlaySoundFromSource(string ClipName, AudioSource NewSource)
+    {
+        AudioClips AudioClip = Array.Find(SoundBank, AudioClips => AudioClips.Name == ClipName);
+        if (AudioClip != null)
+        {
+            NewSource.clip = AudioClip.Clip;
+            NewSource.volume = AudioClip.Volume;
+            NewSource.loop = AudioClip.Loop;
+            NewSource.Play();
+        }
+    }
     //This is unnecessary as each clip has it's own source. It will not have a new source to play non-exclusive sounds
     ///// <summary>
     ///// Plays a sound effect "audioName"

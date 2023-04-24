@@ -20,5 +20,6 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: a78215668a5adf34eb52ca0928034e24, type: 3}
   spriteColour: {r: 1, g: 1, b: 1, a: 1}
   animator: {fileID: 22100000, guid: 6c144445f56899848976623214a2b118, type: 2}
+  spotSoundIdentifier: MScream
   npcPrefab: {fileID: 8817888258833637102, guid: 29dd129ec6090404298809bce1114abc, type: 3}
   killed: 0

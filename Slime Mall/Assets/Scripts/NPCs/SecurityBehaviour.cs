@@ -18,7 +18,7 @@ public class SecurityBehaviour : NPCBehaviour
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
                     speed += 2.5f;
-                    ChangeState(StateMachine.CHASE);
+                    ChangeState(StateMachine.SIGHT);
                 }
                 //Idle enough
                 else if (Time.time >= lastStep + idleTime)
@@ -34,7 +34,7 @@ public class SecurityBehaviour : NPCBehaviour
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
                     speed += 2.5f;
-                    ChangeState(StateMachine.CHASE);
+                    ChangeState(StateMachine.SIGHT);
                 }
                 else if (Time.time >= lastStep + wanderTime)
                 {
@@ -43,7 +43,11 @@ public class SecurityBehaviour : NPCBehaviour
                     ChangeState(StateMachine.IDLE);
                 }
                 break;
+            case StateMachine.SIGHT:
+                AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
+                ChangeState(StateMachine.CHASE);
 
+                break;
             case StateMachine.CHASE:
                 // Have we seen the slime and is he not hidden
                 if(CheckForSlime() == true)

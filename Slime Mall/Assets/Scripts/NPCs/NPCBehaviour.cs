@@ -10,6 +10,8 @@ public class NPCBehaviour : MonoBehaviour
     }
     protected float speed;
     protected float radius;
+    protected string spotSoundIdentifier;
+    protected AudioSource audioSource;
 
     protected Rigidbody2D rb;
     protected SpriteRenderer sr;
@@ -30,6 +32,7 @@ public class NPCBehaviour : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         sight = GetComponent<NPCSightComponent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         lastStep = Time.time;
     }
 
@@ -47,6 +50,9 @@ public class NPCBehaviour : MonoBehaviour
         wanderTime = settings.wanderTime + offset;
         animator.runtimeAnimatorController = settings.animator;
         sight.SetSightRadius(settings.radius);
+
+        spotSoundIdentifier = settings.spotSoundIdentifier;
+        Debug.Log(settings.spotSoundIdentifier);
     }
 
     void Update()
@@ -104,6 +110,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.SIGHT:
+                AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
                 ChangeState(StateMachine.ESCAPE);
                 break;
             case StateMachine.ESCAPE:

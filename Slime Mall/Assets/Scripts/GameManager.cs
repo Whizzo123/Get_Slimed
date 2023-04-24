@@ -77,17 +77,24 @@ public class GameManager : MonoBehaviour
         UI.instance.TimeOutEnd(score, hiscore);
     }
 
+    bool endedOnce = false;
     public void CapturedEndGame()
     {
-        if (score > hiscore)
-        {
-            hiscore = score;
-            PlayerPrefs.SetInt("HiScore", hiscore);
+        if (!endedOnce) 
+        { 
+            endedOnce = true;
+            if (score > hiscore)
+            {
+                hiscore = score;
+                PlayerPrefs.SetInt("HiScore", hiscore);
+            }
+            AudioManager.instance.PlaySound("Capture");
+            //Disable player movement
+            FindObjectOfType<PlayerController>().FreezePlayer();
+            //Load in end screen ui
+            UI.instance.CapturedEnd(score, hiscore);
+
         }
-        //Disable player movement
-        FindObjectOfType<PlayerController>().FreezePlayer();
-        //Load in end screen ui
-        UI.instance.CapturedEnd(score, hiscore);
 
     }
 

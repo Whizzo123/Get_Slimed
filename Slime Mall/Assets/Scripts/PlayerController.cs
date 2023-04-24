@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     Rigidbody2D rb;
     BoxCollider2D boxCol;
+    AudioSource audioSource;
     Vector2 dir;
 
     SpriteRenderer sr;
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
         boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         checkArea.radius = interactRadius;
 
@@ -164,6 +166,14 @@ public class PlayerController : MonoBehaviour
         //Enable movement
         UnFreezePlayer();
         //Reposition
+    }
+    public void E_InteractSound()
+    {
+        AudioManager.instance.PlaySoundFromSource("Interact", audioSource);
+    }
+    public void E_ConsumeSound()
+    {
+        AudioManager.instance.PlaySoundFromSource("Consume", audioSource);
     }
 
     void DoInteract(InputAction.CallbackContext obj)
