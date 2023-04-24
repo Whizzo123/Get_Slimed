@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 216.7, y: -259.3599}
-  m_SizeDelta: {x: 167.5162, y: 42.7198}
+  m_SizeDelta: {x: 167.5162, y: 42.719788}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2643145179974728260
 CanvasRenderer:
@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.42279816, y: 3.5}
+  m_AnchoredPosition: {x: 0.4228058, y: 3.5}
   m_SizeDelta: {x: -18.5214, y: -13.3179}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2643145180034236015
@@ -294,7 +294,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.42279816, y: 5.1065}
+  m_AnchoredPosition: {x: 0.42279053, y: 5.1065063}
   m_SizeDelta: {x: -18.5214, y: -16.4228}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2643145180230496635
@@ -540,6 +540,7 @@ GameObject:
   - component: {fileID: 2643145180879611383}
   - component: {fileID: 2643145180879611381}
   - component: {fileID: 2643145180879611380}
+  - component: {fileID: 4395267148773699921}
   m_Layer: 5
   m_Name: HighscoreScreen
   m_TagString: Untagged
@@ -556,7 +557,7 @@ RectTransform:
   m_GameObject: {fileID: 2643145180879611382}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.89393, y: 0.89393, z: 0.89393}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2643145180444170039}
@@ -593,7 +594,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -610,6 +611,29 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4395267148773699921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2643145180879611382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26147a6083a5d6540b56cd9b2cf4c9be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Score: {fileID: 2643145181396997202}
+  HighScore: {fileID: 2643145181002851799}
+  BounceObjects:
+  - {fileID: 2643145180444170038}
+  - {fileID: 2643145181002851793}
+  - {fileID: 2643145181345698070}
+  - {fileID: 2643145181396998060}
+  - {fileID: 2643145181892682795}
+  - {fileID: 2643145179974728256}
+  ScaleAmount: 1
+  ScaleTime: 2
 --- !u!1 &2643145181002851793
 GameObject:
   m_ObjectHideFlags: 0
@@ -995,7 +1019,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -213.24188, y: -259.3599}
-  m_SizeDelta: {x: 167.5162, y: 42.7198}
+  m_SizeDelta: {x: 167.5162, y: 42.719788}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2643145181892682799
 CanvasRenderer:

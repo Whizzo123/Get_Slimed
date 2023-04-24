@@ -233,7 +233,7 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, interactRadius);
     }
 
-    private void FreezePlayer()
+    public void FreezePlayer()
     {
         isMovementEnabled = false;
         GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
