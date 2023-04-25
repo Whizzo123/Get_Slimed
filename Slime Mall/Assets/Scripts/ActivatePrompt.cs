@@ -49,22 +49,28 @@ public class ActivatePrompt : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (emotionResponse.activeSelf == false && onlyEmotion == false)
+        if (emotionResponse != null)
         {
-            if (col.CompareTag("PlayerArea"))
+            if (emotionResponse.activeSelf == false && onlyEmotion == false)
             {
-                prompt.SetActive(true);
+                if (col.CompareTag("PlayerArea"))
+                {
+                    prompt.SetActive(true);
+                }
             }
         }
     }
 
     void OnTriggerExit2D(Collider2D col)
     {
-        if (emotionResponse.activeSelf == false && onlyEmotion == false)
+        if (emotionResponse != null)
         {
-            if (col.CompareTag("PlayerArea"))
+            if (emotionResponse.activeSelf == false && onlyEmotion == false)
             {
-                prompt.SetActive(false);
+                if (col.CompareTag("PlayerArea"))
+                {
+                    prompt.SetActive(false);
+                }
             }
         }
     }
