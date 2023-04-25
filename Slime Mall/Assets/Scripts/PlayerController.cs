@@ -285,7 +285,7 @@ public class PlayerController : MonoBehaviour
     public void FreezePlayer()
     {
         isMovementEnabled = false;
-        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
+        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
     private void UnFreezePlayer()

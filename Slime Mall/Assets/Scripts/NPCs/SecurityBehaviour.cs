@@ -67,10 +67,15 @@ public class SecurityBehaviour : NPCBehaviour
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.GetComponent<PlayerController>())
+        PlayerController playerController;
+        collision.gameObject.TryGetComponent<PlayerController>(out playerController);
+        if(playerController)
         {
-            //Send off a call to game manager
-            GameManager.instance.CapturedEndGame();
+            if (playerController.IsSlimeHidden() == false)
+            {
+                //Send off a call to game manager
+                GameManager.instance.CapturedEndGame();
+            }
         }
     }
 }
