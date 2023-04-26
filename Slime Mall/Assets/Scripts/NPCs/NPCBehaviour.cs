@@ -70,10 +70,13 @@ public class NPCBehaviour : MonoBehaviour
         {
             sight.UpdateSight(dir);
         }
-        UpdateStateMachine();
-
         animator.SetFloat("Horizontal", rb.velocity.normalized.x);
         animator.SetFloat("Vertical", rb.velocity.normalized.y);
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateStateMachine();
     }
 
     public virtual void UpdateStateMachine()
@@ -82,7 +85,7 @@ public class NPCBehaviour : MonoBehaviour
         {
             case StateMachine.IDLE:
                 //Idle enough
-                    speed = 1.5f;
+                    speed = 1f;
                 if (CheckForSlime() == true)
                 {
                     GetComponent<ActivatePrompt>().ShowEmotion();
@@ -96,7 +99,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.WANDER:
-                    speed = 1.5f;
+                    speed = 1f;
                 MoveNPC(dir);
                 if (CheckForSlime() == true)
                 {
@@ -117,7 +120,7 @@ public class NPCBehaviour : MonoBehaviour
                 break;
             case StateMachine.ESCAPE:
                 const float runawayThresholdDistance = 7.5f;
-                    speed = 4;
+                    speed = 3;
                 if (Vector2.Distance(spottedSlime.transform.position, this.transform.position) >= runawayThresholdDistance)
                 {
                     GetComponent<ActivatePrompt>().HideEmotion();

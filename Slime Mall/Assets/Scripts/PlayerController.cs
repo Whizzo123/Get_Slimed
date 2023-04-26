@@ -113,10 +113,12 @@ public class PlayerController : MonoBehaviour
                 sr.flipX = true;
             else if (dir.x > 0)
                 sr.flipX = false;
-
-            ProcessInput();
-
         }
+    }
+
+    private void FixedUpdate()
+    {
+        ProcessInput();
     }
 
     void ProcessInput()
@@ -250,6 +252,11 @@ public class PlayerController : MonoBehaviour
 
     void DoKill(InputAction.CallbackContext obj)
     {
+        // If the slime is hiding don't let them kill an NPC
+        if(IsSlimeHidden() == true)
+        {
+            return;
+        }
         Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
 
         foreach(Collider2D col in colls)
