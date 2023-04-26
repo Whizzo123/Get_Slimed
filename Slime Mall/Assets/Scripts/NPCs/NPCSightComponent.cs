@@ -11,7 +11,7 @@ public class NPCSightComponent : MonoBehaviour
     List<GameObject> seenGameObjects;
 
     public LayerMask seeableObjectsLayer;
-    private float TimeToWaitToSee = 1.0f;
+    private float TimeToWaitToSee = 0.1f;
     private float CurrentWaitingTimeToSee = 0.0f;
     private Vector3 debugWireSpherePosition = Vector3.zero;
 

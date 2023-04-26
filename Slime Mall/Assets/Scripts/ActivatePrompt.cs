@@ -34,17 +34,7 @@ public class ActivatePrompt : MonoBehaviour
 
     private void Update()
     {
-        //if(emotionResponse.activeSelf == true)
-        //{
-        //    if(CurrentTimeShowingEmotion > TimeToShowEmotion)
-        //    {
-        //        emotionResponse.SetActive(false);
-        //    }
-        //    else
-        //    {
-        //        CurrentTimeShowingEmotion += Time.deltaTime;
-        //    }
-        //}
+    
     }
 
     void OnTriggerEnter2D(Collider2D col)
