@@ -310,4 +310,16 @@ public class PlayerController : MonoBehaviour
         isMovementEnabled = true;
         GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
     }
+
+    public void Cleanup()
+    {
+        input.Movement.Interact.performed -= DoInteract;
+        input.Movement.Interact.Disable();
+
+        input.Movement.Kill.performed -= DoKill;
+        input.Movement.Kill.Disable();
+
+        input.Movement.Pause.performed -= DoPause;
+        input.Movement.Pause.Disable();
+    }
 }

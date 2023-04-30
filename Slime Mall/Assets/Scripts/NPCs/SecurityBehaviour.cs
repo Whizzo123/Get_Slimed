@@ -73,6 +73,8 @@ public class SecurityBehaviour : NPCBehaviour
         {
             if (playerController.IsSlimeHidden() == false)
             {
+                //Disconnect player from input system
+                playerController.Cleanup();
                 //Send off a call to game manager
                 GameManager.instance.CapturedEndGame();
             }

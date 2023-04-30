@@ -52,8 +52,14 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
-        if (isGamePaused) Time.timeScale = 1.0f;
-        else Time.timeScale = 0.0f;
+        if (isGamePaused)
+        {
+            Time.timeScale = 1.0f;
+        }
+        else
+        { 
+            Time.timeScale = 0.0f;
+        }
 
         isGamePaused = !isGamePaused;
         UI.instance.PauseActive(isGamePaused);
