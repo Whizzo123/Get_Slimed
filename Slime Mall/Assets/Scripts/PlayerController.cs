@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     InputAction movement;
     Animator animator;
     Rigidbody2D rb;
+    BoxCollider2D boxCol;
+    AudioSource audioSource;
     Vector2 dir;
 
     SpriteRenderer sr;
@@ -18,6 +20,10 @@ public class PlayerController : MonoBehaviour
     [Header("Move")]
     [Range(1f, 100f), Tooltip("Player movement speed")]
     public float moveSpeed = 5f;
+    public float sprintSpeed = 15.0f;
+    public float sprintDelay = 2.0f;
+    private float originalSprintDelay;
+    private float originalMovespeed;
 
     [Header("Inteactions")]
     public LayerMask interactLayer;
@@ -32,6 +38,10 @@ public class PlayerController : MonoBehaviour
     GameObject ventHidingIn;
     bool isMovementEnabled = true;
 
+    bool isInteractEnabled = true;
+
+    float speedJuice = 3;
+
     void Awake()
     {
         if (instance == null) instance = this;
@@ -39,8 +49,10 @@ public class PlayerController : MonoBehaviour
 
         input = new Controls();
         rb = GetComponent<Rigidbody2D>();
+        boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         checkArea.radius = interactRadius;
 
@@ -56,6 +68,9 @@ public class PlayerController : MonoBehaviour
 
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
+
+        originalMovespeed = moveSpeed;
+        originalSprintDelay = sprintDelay;
     }
 
     // Update is called once per frame
@@ -65,15 +80,47 @@ public class PlayerController : MonoBehaviour
         {
             //Get dir
             dir = movement.ReadValue<Vector2>();
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                sprintDelay = originalSprintDelay;
+                speedJuice -= Time.deltaTime;
+                if (speedJuice <= 0)
+                {
+                    moveSpeed = originalMovespeed;
+                    speedJuice = 0;
+                }
+                else
+                {
+                    moveSpeed = sprintSpeed;
+                }
+            }
+            else
+            {
 
+                sprintDelay -= Time.deltaTime;
+                if (sprintDelay <= 0)
+                {
+                    speedJuice += Time.deltaTime;
+                    if (speedJuice >= 3)
+                    {
+                        speedJuice = 3;
+                    }
+                }
+
+                 moveSpeed = originalMovespeed;
+            }
+            UI.instance.ChangeSprintBar(speedJuice);
             //Flip sprite based on dir
             if (dir.x < 0)
                 sr.flipX = true;
             else if (dir.x > 0)
                 sr.flipX = false;
-
-            ProcessInput();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        ProcessInput();
     }
 
     void ProcessInput()
@@ -97,6 +144,7 @@ public class PlayerController : MonoBehaviour
         //When called once, will go into bin animation. When called again, will exit bin animation.
         if (!animator.GetBool("Bin"))
         {
+            isInteractEnabled = false;
             animator.SetTrigger("EnterBin");
             animator.SetBool("Bin", true);
             binHidingIn = binGameObject;
@@ -106,11 +154,11 @@ public class PlayerController : MonoBehaviour
             //Reposition
             Vector3 directionFacingBin = binGameObject.transform.position - transform.position;
             transform.position = binGameObject.transform.position + (directionFacingBin.normalized) / 4;
-            //Disable visible by AI
-            
+            isInteractEnabled = true;
         }
         else
         {
+            isInteractEnabled = false;
             animator.SetBool("Bin", false);
             //Animation event will call E_ExitedBin() after animation is finished.
             //Enable Vision by AI
@@ -118,7 +166,6 @@ public class PlayerController : MonoBehaviour
 
 
     }
-
     public void E_ExitedBin()
     {
         Debug.Log("Exited Bin Fully");
@@ -126,7 +173,7 @@ public class PlayerController : MonoBehaviour
         binHidingIn = null;
         //Enable movement
         UnFreezePlayer();
-        //Reposition
+        isInteractEnabled = true;
     }
 
     public void InteractWithVent(GameObject ventGameObject)
@@ -135,6 +182,7 @@ public class PlayerController : MonoBehaviour
         //When called once, will go into vent animation. When called again, will exit vent animation.
         if (!animator.GetBool("Vent"))
         {
+            isInteractEnabled = false;
             animator.SetTrigger("EnterVent");
             animator.SetBool("Vent", true);
             ventHidingIn = ventGameObject;
@@ -144,11 +192,12 @@ public class PlayerController : MonoBehaviour
             //Reposition
             Vector3 directionFacingBin = ventGameObject.transform.position - transform.position;
             transform.position = ventGameObject.transform.position + (directionFacingBin.normalized) / 4;
-            //Disable visible by AI
+            isInteractEnabled = true;
 
         }
         else
         {
+            isInteractEnabled = false;
             animator.SetBool("Vent", false);
             //Animation event will call E_ExitedVent() after animation is finished.
             //Enable Vision by AI
@@ -162,37 +211,49 @@ public class PlayerController : MonoBehaviour
         ventHidingIn = null;
         //Enable movement
         UnFreezePlayer();
-        //Reposition
+        isInteractEnabled = true;
+    }
+    public void E_InteractSound()
+    {
+        AudioManager.instance.PlaySoundFromSource("Interact", audioSource);
+    }
+    public void E_ConsumeSound()
+    {
+        AudioManager.instance.PlaySoundFromSource("Consume", audioSource);
     }
 
     void DoInteract(InputAction.CallbackContext obj)
     {
-        Debug.Log("Do interact");
-        if (binHidingIn)
+        // Interact is disabled while in the middle of interacting want to prevent spamming 'E'
+        if (isInteractEnabled)
         {
-            InteractWithBin(null);
-            return;
-        }
-        else if (ventHidingIn)
-        {
-            InteractWithVent(null);
-            return;
-        }
-        else
-        {
-            Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
-            foreach (Collider2D collider in colls)
+            Debug.Log("Do interact");
+            if (binHidingIn)
             {
-                // Are we within the radius of interacting with the bin?
-                if (collider.GetComponent<Bin>() != null)
+                InteractWithBin(null);
+                return;
+            }
+            else if (ventHidingIn)
+            {
+                InteractWithVent(null);
+                return;
+            }
+            else
+            {
+                Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+                foreach (Collider2D collider in colls)
                 {
-                    InteractWithBin(collider.gameObject);
-                    return;
-                }
-                else if(collider.GetComponent<Vent>() != null)
-                {
-                    InteractWithVent(collider.gameObject);
-                    return;
+                    // Are we within the radius of interacting with the bin?
+                    if (collider.GetComponent<Bin>() != null)
+                    {
+                        InteractWithBin(collider.gameObject);
+                        return;
+                    }
+                    else if (collider.GetComponent<Vent>() != null)
+                    {
+                        InteractWithVent(collider.gameObject);
+                        return;
+                    }
                 }
             }
         }
@@ -200,6 +261,12 @@ public class PlayerController : MonoBehaviour
 
     void DoKill(InputAction.CallbackContext obj)
     {
+        // If the slime is hiding don't let them kill an NPC
+        if(IsSlimeHidden() == true)
+        {
+            return;
+        }
+        // TODO this has an issue with PlayerController still being referenced after destruction
         Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
 
         foreach(Collider2D col in colls)
@@ -221,21 +288,38 @@ public class PlayerController : MonoBehaviour
         GameManager.instance.PauseGame();
     }
 
+    public bool IsSlimeHidden()
+    {
+        return binHidingIn || ventHidingIn;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactRadius);
     }
 
-    private void FreezePlayer()
+    public void FreezePlayer()
     {
         isMovementEnabled = false;
-        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
+        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
     private void UnFreezePlayer()
     {
         isMovementEnabled = true;
         GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
+
+    public void Cleanup()
+    {
+        input.Movement.Interact.performed -= DoInteract;
+        input.Movement.Interact.Disable();
+
+        input.Movement.Kill.performed -= DoKill;
+        input.Movement.Kill.Disable();
+
+        input.Movement.Pause.performed -= DoPause;
+        input.Movement.Pause.Disable();
     }
 }

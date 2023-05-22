@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
     [Range(0,360)]
     public float sessionLenght = 120;
     public int score = 0;
-    public int killValue = 50;
+    public int hiscore = 0;
+    public int killValue = 10;
 
     bool isGamePaused = false;
 
@@ -18,6 +19,9 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
+
+        hiscore = PlayerPrefs.GetInt("HiScore");
+
     }
 
     void Start()
@@ -32,6 +36,8 @@ public class GameManager : MonoBehaviour
             sessionLenght -= Time.deltaTime;
             if(sessionLenght <= 0 ) 
             {
+                isGamePaused = true;
+
                 EndGame();
             }
             UI.instance.UpdatedTimer(Mathf.FloorToInt(sessionLenght / 60), Mathf.FloorToInt(sessionLenght % 60));
@@ -46,8 +52,14 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
-        if (isGamePaused) Time.timeScale = 1.0f;
-        else Time.timeScale = 0.0f;
+        if (isGamePaused)
+        {
+            Time.timeScale = 1.0f;
+        }
+        else
+        { 
+            Time.timeScale = 0.0f;
+        }
 
         isGamePaused = !isGamePaused;
         UI.instance.PauseActive(isGamePaused);
@@ -60,6 +72,35 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
+        if(score > hiscore)
+        {
+            hiscore = score;
+            PlayerPrefs.SetInt("HiScore", hiscore);
+        }
+        //Disable player movement
+        FindObjectOfType<PlayerController>().FreezePlayer();
+        //Load in end screen ui
+        UI.instance.TimeOutEnd(score, hiscore);
+    }
+
+    bool endedOnce = false;
+    public void CapturedEndGame()
+    {
+        if (!endedOnce) 
+        { 
+            endedOnce = true;
+            if (score > hiscore)
+            {
+                hiscore = score;
+                PlayerPrefs.SetInt("HiScore", hiscore);
+            }
+            AudioManager.instance.PlaySound("Capture");
+            //Disable player movement
+            FindObjectOfType<PlayerController>().FreezePlayer();
+            //Load in end screen ui
+            UI.instance.CapturedEnd(score, hiscore);
+
+        }
 
     }
 

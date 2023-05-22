@@ -6,28 +6,33 @@ public class NPCBehaviour : MonoBehaviour
 {
     public enum StateMachine
     {
-        IDLE, WANDER, SIGHT, ESCAPE
+        IDLE, WANDER, SIGHT, ESCAPE, CHASE
     }
-    float speed;
-    float radius;
+    protected float speed;
+    protected float radius;
+    protected string spotSoundIdentifier;
+    protected AudioSource audioSource;
 
-    Rigidbody2D rb;
-    SpriteRenderer sr;
-    Animator animator;
-    Vector2 dir;
+    protected Rigidbody2D rb;
+    protected SpriteRenderer sr;
+    protected Animator animator;
+    protected NPCSightComponent sight;
+    protected Vector2 dir;
 
-    float idleTime;
-    float wanderTime;
-    float lastStep;
+    protected float idleTime;
+    protected float wanderTime;
+    protected float lastStep;
 
-    StateMachine myState = StateMachine.IDLE;
-
-    bool lookingLeft => sr.flipX;
+    protected StateMachine myState = StateMachine.IDLE;
+    protected GameObject spottedSlime;
+    protected bool lookingLeft => sr.flipX;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        sight = GetComponent<NPCSightComponent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         lastStep = Time.time;
     }
 
@@ -44,6 +49,10 @@ public class NPCBehaviour : MonoBehaviour
         offset = Random.Range(wanderTime, wanderTime + 5);
         wanderTime = settings.wanderTime + offset;
         animator.runtimeAnimatorController = settings.animator;
+        sight.SetSightRadius(settings.radius);
+
+        spotSoundIdentifier = settings.spotSoundIdentifier;
+        Debug.Log(settings.spotSoundIdentifier);
     }
 
     void Update()
@@ -53,12 +62,36 @@ public class NPCBehaviour : MonoBehaviour
             sr.flipX = true;
         else if (dir.x > 0)
             sr.flipX = false;
+        if (dir == Vector2.zero)
+        {
+            sight.UpdateSight(new Vector2(-1, 0));
+        }
+        else
+        {
+            sight.UpdateSight(dir);
+        }
+        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
+        animator.SetFloat("Vertical", rb.velocity.normalized.y);
+    }
 
+    private void FixedUpdate()
+    {
+        UpdateStateMachine();
+    }
+
+    public virtual void UpdateStateMachine()
+    {
         switch (myState)
         {
             case StateMachine.IDLE:
                 //Idle enough
-                if(Time.time >= lastStep + idleTime)
+                    speed = 1f;
+                if (CheckForSlime() == true)
+                {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
+                    ChangeState(StateMachine.SIGHT);
+                }
+                else if (Time.time >= lastStep + idleTime)
                 {
                     dir = FindDirection();
                     ChangeState(StateMachine.WANDER);
@@ -66,8 +99,13 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.WANDER:
-                rb.velocity = Vector2.zero;
-                rb.velocity += new Vector2(dir.x, dir.y) * speed * 100 * Time.deltaTime;
+                    speed = 1f;
+                MoveNPC(dir);
+                if (CheckForSlime() == true)
+                {
+                    GetComponent<ActivatePrompt>().ShowEmotion();
+                    ChangeState(StateMachine.SIGHT);
+                }
                 if (Time.time >= lastStep + wanderTime)
                 {
                     dir = Vector2.zero;
@@ -77,27 +115,47 @@ public class NPCBehaviour : MonoBehaviour
                 break;
 
             case StateMachine.SIGHT:
-                //Get scared
-                //Call guards
+                AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
+                ChangeState(StateMachine.ESCAPE);
                 break;
-
             case StateMachine.ESCAPE:
-                //Run opposite of slime at increased speed
+                const float runawayThresholdDistance = 7.5f;
+                    speed = 3;
+                if (Vector2.Distance(spottedSlime.transform.position, this.transform.position) >= runawayThresholdDistance)
+                {
+                    GetComponent<ActivatePrompt>().HideEmotion();
+                    ChangeState(StateMachine.IDLE);
+                }
+                else
+                {
+                    dir = (transform.position - spottedSlime.transform.position).normalized;
+                    MoveNPC(dir);
+                }
                 break;
         }
-        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
-        animator.SetFloat("Vertical", rb.velocity.normalized.y);
     }
 
     public Vector2 FindDirection()
     {
-        Vector2 target = rb.position + Random.insideUnitCircle * radius;
-        return target.normalized - rb.position.normalized;
+        Vector2 target = NPCManager.instance.FindPointForMyZone(this);
+        return (target - rb.position).normalized;
     }
 
-    void ChangeState(StateMachine state)
+    protected void ChangeState(StateMachine state)
     {
         myState = state;
         lastStep = Time.time;
+    }
+
+    protected void MoveNPC(Vector2 dir)
+    {
+        rb.velocity = Vector2.zero;
+        rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
+    }
+
+    protected bool CheckForSlime()
+    {
+        spottedSlime = sight.PollForSeenObjectOfType<PlayerController>();
+        return spottedSlime != null && spottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false;
     }
 }

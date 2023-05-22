@@ -14,6 +14,14 @@ public class UI : MonoBehaviour
     public GameObject settingsScreen;
     public GameObject creditsScreen;
 
+    public GameObject guiScreen;
+    public GameObject capturedScreen;
+    public GameObject timeOutScreen;
+
+    public Image sprintBar;
+    public float sprintAmount = 3.0f;
+
+
     public GameObject loadingScreen;
     public Slider slider;
     public TextMeshProUGUI progressText;
@@ -83,5 +91,27 @@ public class UI : MonoBehaviour
     public void QuitButton()
     {
         GameManager.instance.Quit();
+    }
+
+    public void CapturedEnd(int score, int hiscore)
+    {
+        guiScreen.SetActive(false);
+        capturedScreen.SetActive(true);
+        capturedScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
+        capturedScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
+
+    }
+    public void TimeOutEnd(int score, int hiscore)
+    {
+        guiScreen.SetActive(false);
+        timeOutScreen.SetActive(true);
+        timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
+        timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
+    }
+
+    public void ChangeSprintBar(float amount)
+    {
+        sprintAmount = amount;
+        sprintBar.fillAmount = sprintAmount / 3.0f;
     }
 }
