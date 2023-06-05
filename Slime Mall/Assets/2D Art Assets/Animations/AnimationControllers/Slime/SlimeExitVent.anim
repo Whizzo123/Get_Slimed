@@ -104,9 +104,9 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.7
-    functionName: E_ExitedVent
+    functionName: E_ExitedHidingObject
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 8d17b45d19a440a409c4faab9594c2bb, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
