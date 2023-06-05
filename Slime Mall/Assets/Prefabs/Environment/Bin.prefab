@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1768529906100285472}
   - component: {fileID: 1061390104510891583}
   - component: {fileID: 6285770318597676612}
+  - component: {fileID: 6866542398771203188}
   m_Layer: 3
   m_Name: Bin
   m_TagString: Untagged
@@ -157,6 +158,20 @@ MonoBehaviour:
   sprite: {fileID: 1768529906100285478}
   isSortingUpdating: 1
   yOffset: 0
+--- !u!114 &6866542398771203188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768529906100285473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92c96f965aa17b34fb79bed7eedf9441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeleportingArrows: []
+  ObjectAnimationIdentifier: Bin
 --- !u!1 &5602002411846737602
 GameObject:
   m_ObjectHideFlags: 0
