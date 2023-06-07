@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intScore: 0
   Speed: 3
-  radius: 2
-  idleTime: 5
-  wanderTime: 2
-  sprite: {fileID: 21300000, guid: b7a5db9991078704fae1f416abdbe279, type: 3}
-  spriteColour: {r: 1, g: 1, b: 1, a: 1}
-  animator: {fileID: 22100000, guid: 292ab8fc19cac604e88ee8598e9c790f, type: 2}
-  spotSoundIdentifier: Spot
-  npcPrefab: {fileID: 7226305476576412004, guid: 7b869462e69b0744d80f453d6924da44, type: 3}
-  killed: 0
+  Radius: 5
+  IdleTime: 5
+  WanderTime: 5
+  Sprite: {fileID: -747339029, guid: f365dd0cd2a79d34d8f653c9db71cf02, type: 3}
+  SpriteColour: {r: 1, g: 1, b: 1, a: 1}
+  Animator: {fileID: 22100000, guid: 292ab8fc19cac604e88ee8598e9c790f, type: 2}
+  SpotSoundIdentifier: Spot
+  NpcPrefab: {fileID: 7226305476576412004, guid: 7b869462e69b0744d80f453d6924da44, type: 3}
+  Killed: 0

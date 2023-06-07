@@ -2,87 +2,115 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+/*
+*AUTHOR: Antonio Villalta Isidro
+*EDITORS: Tanapat Somrid
+*DATEOFCREATION: dd/mm/yyyy
+*DESCRIPTION: Description of file and usage
+*/
+//TODO: We need a way to ensure that Guards are spawned in every zone OR that they can roam to every zone
 
 public class NPCManager : MonoBehaviour
 {
     [System.Serializable]
     public struct NPC
     {
-        public NPCObject npc;
-        public int amount;
+        public NPCObject NPCType;
+        public int Amount;
     }
 
-    public static NPCManager instance;
+    public static NPCManager Instance;
 
     public List<NPC> NPCList;
-    List<NPCBehaviour> entities = new List<NPCBehaviour>();
-    Dictionary<NPCBehaviour, int> npcToZone = new Dictionary<NPCBehaviour, int>();
-    public BoxCollider2D[] spawnAreas = new BoxCollider2D[3];
-    [Range(0f, 2f)]
-    public float NPCMoveSpeed = 1;
+    Dictionary<NPCBehaviour, int> NPCInZone = new Dictionary<NPCBehaviour, int>();
+    public BoxCollider2D[] SpawnZones = new BoxCollider2D[3];
 
     void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(this);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
         SpawnNPCs();
     }
 
     public Vector2 FindPointForMyZone(NPCBehaviour npc)
     {
-        int zone = npcToZone[npc];
-        float movePointX = Random.Range(spawnAreas[zone].bounds.min.x, spawnAreas[zone].bounds.max.x);
-        float movePointY = Random.Range(spawnAreas[zone].bounds.min.y, spawnAreas[zone].bounds.max.y);
+        int zone = NPCInZone[npc];
+        float movePointX = Random.Range(SpawnZones[zone].bounds.min.x, SpawnZones[zone].bounds.max.x);
+        float movePointY = Random.Range(SpawnZones[zone].bounds.min.y, SpawnZones[zone].bounds.max.y);
         return new Vector2(movePointX, movePointY);
     }
 
     public void SpawnNPCs()
     {
+        //Spawn based on NPCList types and how many of the types there are
         for (int i = 0; i < NPCList.Count; i++)
         {           
-            for (int j = 0; j < NPCList[i].amount; j++)
+            for (int j = 0; j < NPCList[i].Amount; j++)
             {
-                int spawnZone = Random.Range(0, spawnAreas.Length);
-                float spawnPointX = Random.Range(spawnAreas[spawnZone].bounds.min.x, spawnAreas[spawnZone].bounds.max.x);
-                float spawnPointY = Random.Range(spawnAreas[spawnZone].bounds.min.y, spawnAreas[spawnZone].bounds.max.y);
-                GameObject temp = Instantiate(NPCList[i].npc.npcPrefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity, transform);
-                temp.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].npc);
-                entities.Add(temp.GetComponent<NPCBehaviour>());
-                npcToZone.Add(temp.GetComponent<NPCBehaviour>(), spawnZone);
+                //Get random points and zones
+                int RandomSpawn = Random.Range(0, SpawnZones.Length);
+                Vector2 SpawnPoint = GetRandomPointInZone(RandomSpawn);
+
+                //Spawn new NPC
+                GameObject NewNPC = Instantiate(NPCList[i].NPCType.NpcPrefab, SpawnPoint, Quaternion.identity, transform);
+                NewNPC.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].NPCType);
+
+                NPCInZone.Add(NewNPC.GetComponent<NPCBehaviour>(), RandomSpawn);
             }
         }
     }
 
-    private void Update()
+    public void KillNPC(NPCBehaviour KilledNPC)
     {
-        if(entities.Count < 14)
+        if (NPCInZone.ContainsKey(KilledNPC))
         {
-            for (int i = 0; i < 6; i++)
-            {
-                int spawnZone = Random.Range(0, 2);
-                float spawnPointX = Random.Range(spawnAreas[spawnZone].bounds.min.x, spawnAreas[spawnZone].bounds.max.x);
-                float spawnPointY = Random.Range(spawnAreas[spawnZone].bounds.min.y, spawnAreas[spawnZone].bounds.max.y);
-                int npcIndex = Random.Range(1, 3);
-                GameObject temp = Instantiate(NPCList[npcIndex].npc.npcPrefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity, transform);
-                temp.GetComponent<NPCBehaviour>().GetSettings(NPCList[npcIndex].npc);
-                entities.Add(temp.GetComponent<NPCBehaviour>());
-                npcToZone.Add(temp.GetComponent<NPCBehaviour>(), spawnZone);
-            }
+            MoveNPCToAlternateZone(KilledNPC, NPCInZone[KilledNPC]);
+        }
+        else
+        {
+            Destroy(KilledNPC);
+            Debug.LogError("NPC Does not exist within a zone");
         }
     }
 
-    public void KillNPC(GameObject npc)
+    private void MoveNPCToAlternateZone(NPCBehaviour NPCToMove, int OriginalZone)
     {
-        foreach(NPCBehaviour obj in entities)
+        //Get random other spawn
+        int NewSpawnZone = GetRandomSpawnZone(OriginalZone);
+        Vector2 NewPoint = GetRandomPointInZone(NewSpawnZone);
+
+        //Move NPC and ready it
+        NPCToMove.transform.position = new Vector2(NewPoint.x, NewPoint.y);
+        NPCToMove.ResetNPC();
+
+    }
+    private int GetRandomSpawnZone(int SpawnPointToNotUse)
+    {
+        Debug.Log("Not using:" + SpawnPointToNotUse);
+        //Populate list with all spawnpoint indexes and then remove the one we do not want to use
+        List<int> SpawnZoneIndex = new List<int>(SpawnZones.Length);
+        for (int i = 0; i < SpawnZones.Length; i++)
         {
-            //NPC we want to kill
-            if(obj.gameObject == npc)
-            {
-                entities.Remove(obj);
-                npcToZone.Remove(obj);
-                Destroy(obj.gameObject);
-                return;
-            }
+            SpawnZoneIndex.Add(i);
         }
+        SpawnZoneIndex.RemoveAt(SpawnPointToNotUse);
+
+        //Choose a random index out of the ones left and grab the index from spawnzones left
+        int NewSpawnZone = Random.Range(0, SpawnZoneIndex.Count);
+        NewSpawnZone = SpawnZoneIndex[NewSpawnZone];
+        Debug.Log("Returned:" + NewSpawnZone);
+        return NewSpawnZone;
+    }
+    private Vector2 GetRandomPointInZone(int Zone)
+    {
+        float SpawnPointX = Random.Range(SpawnZones[Zone].bounds.min.x, SpawnZones[Zone].bounds.max.x);
+        float SpawnPointY = Random.Range(SpawnZones[Zone].bounds.min.y, SpawnZones[Zone].bounds.max.y);
+        return new Vector2(SpawnPointX, SpawnPointY);
     }
 }
