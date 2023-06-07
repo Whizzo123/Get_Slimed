@@ -1,6 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+/*
+*AUTHOR: Unknown
+*EDITORS: Tanapat Somrid
+*DATEOFCREATION: dd/mm/yyyy
+*DESCRIPTION: Description of file and usage
+*/
+
 
 public class NPCBehaviour : MonoBehaviour
 {
@@ -8,70 +16,69 @@ public class NPCBehaviour : MonoBehaviour
     {
         IDLE, WANDER, SIGHT, ESCAPE, CHASE
     }
-    protected float speed;
-    protected float radius;
-    protected string spotSoundIdentifier;
-    protected AudioSource audioSource;
 
-    protected Rigidbody2D rb;
-    protected SpriteRenderer sr;
-    protected Animator animator;
-    protected NPCSightComponent sight;
-    protected Vector2 dir;
+    //protected float Radius;
+    [Header("Components")]
+    protected AudioSource AudioSource;
+    protected Rigidbody2D EntityRigidBody;
+    protected SpriteRenderer EntitySpriteRenderer;
+    protected Animator EntityAnimator;
+    protected NPCSightComponent EntitySight;
 
-    protected float idleTime;
-    protected float wanderTime;
-    protected float lastStep;
+    protected string SpotSoundIdentifier;
 
-    protected StateMachine myState = StateMachine.IDLE;
-    protected GameObject spottedSlime;
-    protected bool lookingLeft => sr.flipX;
+    [Header("Movement")]
+    protected Vector2 MovementDirection;
+    [Tooltip("The highest speed the entity can move at")]protected float RunSpeed = 1;
+    [Tooltip("The original speed the entity can move at")]protected float BaseSpeed = 1;
+    [Tooltip("The current speed the entity moves at")] protected float SpeedMultiplier = 1;
+    protected bool LookingLeft => EntitySpriteRenderer.flipX;
+
+    [Header("States")]
+    protected StateMachine MyState = StateMachine.IDLE;
+    protected float IdleTime;
+    protected float WanderTime;
+    protected float LastStep;
+
+    protected GameObject SpottedSlime;
+
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
-        sight = GetComponent<NPCSightComponent>();
-        animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
-        lastStep = Time.time;
+        AudioSource = GetComponent<AudioSource>();
+        EntityRigidBody = GetComponent<Rigidbody2D>();
+        EntitySpriteRenderer = GetComponent<SpriteRenderer>();
+        EntityAnimator = GetComponent<Animator>();
+        EntitySight = GetComponent<NPCSightComponent>();
+        LastStep = Time.time;
     }
 
-    public void GetSettings(NPCObject settings)
-    {
-        sr.sprite = settings.sprite;
-        sr.color = settings.spriteColour;
-
-        speed = settings.Speed;
-        radius = settings.radius;
-
-        float offset = Random.Range(idleTime, idleTime + 5);
-        idleTime = settings.idleTime + offset;
-        offset = Random.Range(wanderTime, wanderTime + 5);
-        wanderTime = settings.wanderTime + offset;
-        animator.runtimeAnimatorController = settings.animator;
-        sight.SetSightRadius(settings.radius);
-
-        spotSoundIdentifier = settings.spotSoundIdentifier;
-        Debug.Log(settings.spotSoundIdentifier);
-    }
 
     void Update()
     {
         //Flip sprite based on dir
-        if (dir.x < 0)
-            sr.flipX = true;
-        else if (dir.x > 0)
-            sr.flipX = false;
-        if (dir == Vector2.zero)
+        if (MovementDirection.x < 0)
         {
-            sight.UpdateSight(new Vector2(-1, 0));
+            EntitySpriteRenderer.flipX = true;
+        }
+        else if (MovementDirection.x > 0)
+        {
+            EntitySpriteRenderer.flipX = false;
+        }
+
+        //This makes the Entities sight face downards when idle.
+        //This is to account for the fact that when we idle, our sprite appears to be facing downwards as we don't have idle animations for other directions
+        if (MovementDirection == Vector2.zero)
+        {
+            EntitySight.UpdateSight(new Vector2(-1, 0));
         }
         else
         {
-            sight.UpdateSight(dir);
+            EntitySight.UpdateSight(MovementDirection);
         }
-        animator.SetFloat("Horizontal", rb.velocity.normalized.x);
-        animator.SetFloat("Vertical", rb.velocity.normalized.y);
+
+        //Animation 
+        EntityAnimator.SetFloat("Horizontal", EntityRigidBody.velocity.normalized.x);
+        EntityAnimator.SetFloat("Vertical", EntityRigidBody.velocity.normalized.y);
     }
 
     private void FixedUpdate()
@@ -79,83 +86,164 @@ public class NPCBehaviour : MonoBehaviour
         UpdateStateMachine();
     }
 
-    public virtual void UpdateStateMachine()
+    public void GetSettings(NPCObject settings)
     {
-        switch (myState)
-        {
-            case StateMachine.IDLE:
-                //Idle enough
-                    speed = 1f;
-                if (CheckForSlime() == true)
-                {
-                    GetComponent<ActivatePrompt>().ShowEmotion();
-                    ChangeState(StateMachine.SIGHT);
-                }
-                else if (Time.time >= lastStep + idleTime)
-                {
-                    dir = FindDirection();
-                    ChangeState(StateMachine.WANDER);
-                }
-                break;
+        //Sprite
+        EntitySpriteRenderer.sprite = settings.Sprite;
+        EntitySpriteRenderer.color = settings.SpriteColour;
+        EntityAnimator.runtimeAnimatorController = settings.Animator;
+        //Sound
+        SpotSoundIdentifier = settings.SpotSoundIdentifier;
+        //Movement
+        RunSpeed = settings.Speed;
+        //Sight
+        EntitySight.SetSightRadius(settings.Radius);
 
-            case StateMachine.WANDER:
-                    speed = 1f;
-                MoveNPC(dir);
-                if (CheckForSlime() == true)
-                {
-                    GetComponent<ActivatePrompt>().ShowEmotion();
-                    ChangeState(StateMachine.SIGHT);
-                }
-                if (Time.time >= lastStep + wanderTime)
-                {
-                    dir = Vector2.zero;
-                    rb.velocity = Vector2.zero;
-                    ChangeState(StateMachine.IDLE);
-                }
-                break;
-
-            case StateMachine.SIGHT:
-                AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
-                ChangeState(StateMachine.ESCAPE);
-                break;
-            case StateMachine.ESCAPE:
-                const float runawayThresholdDistance = 7.5f;
-                    speed = 3;
-                if (Vector2.Distance(spottedSlime.transform.position, this.transform.position) >= runawayThresholdDistance)
-                {
-                    GetComponent<ActivatePrompt>().HideEmotion();
-                    ChangeState(StateMachine.IDLE);
-                }
-                else
-                {
-                    dir = (transform.position - spottedSlime.transform.position).normalized;
-                    MoveNPC(dir);
-                }
-                break;
-        }
+        //Idle Time
+        float Offset = Random.Range(IdleTime, IdleTime + 5);
+        IdleTime = settings.IdleTime + Offset;
+        //Wander Time
+        Offset = Random.Range(WanderTime, WanderTime + 5);
+        WanderTime = settings.WanderTime + Offset;
     }
 
+    protected virtual void UpdateStateMachine()
+    {
+        switch (MyState)
+        {
+            case StateMachine.IDLE:
+                { 
+                    IdleState();
+                    break;
+                }
+            case StateMachine.WANDER:
+                {
+                    WanderState();
+                    break;
+                }
+            case StateMachine.SIGHT:
+                {
+                    SightState(StateMachine.ESCAPE);
+                    break;
+                }
+            case StateMachine.ESCAPE:
+                {
+                    EscapeState();
+                    break;
+                }
+            case StateMachine.CHASE:
+                {
+                    ChaseState();
+                    break;
+                }
+            default:
+                {
+                    ChangeState(StateMachine.IDLE);
+                    break;
+                }
+        }
+    }
+    protected virtual void IdleState()
+    {
+        SpeedMultiplier = BaseSpeed;
+        if (CheckForSlime() == true)
+        {
+            GetComponent<ActivatePrompt>().ShowEmotion();
+            ChangeState(StateMachine.SIGHT);
+        }
+        else if (Time.time >= LastStep + IdleTime)
+        {
+            MovementDirection = FindDirection();
+            ChangeState(StateMachine.WANDER);
+        }
+    }
+    protected virtual void WanderState()
+    {
+        SpeedMultiplier = BaseSpeed;
+        MoveNPC(MovementDirection);
+        if (CheckForSlime() == true)
+        {
+            GetComponent<ActivatePrompt>().ShowEmotion();
+            ChangeState(StateMachine.SIGHT);
+        }
+        if (Time.time >= LastStep + WanderTime)
+        {
+            MovementDirection = Vector2.zero;
+            EntityRigidBody.velocity = Vector2.zero;
+            ChangeState(StateMachine.IDLE);
+        }
+    }
+    protected virtual void SightState(StateMachine Reaction)
+    {
+        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        ChangeState(Reaction);
+    }
+    protected virtual void EscapeState()
+    {
+        //Runaway from the slime at high speeds or stop running away after a certain distance
+        const float RunawayThresholdDistance = 7.5f;
+        SpeedMultiplier = RunSpeed;
+        if (Vector2.Distance(SpottedSlime.transform.position, this.transform.position) >= RunawayThresholdDistance)
+        {
+            GetComponent<ActivatePrompt>().HideEmotion();
+            ChangeState(StateMachine.IDLE);
+        }
+        else
+        {
+            MovementDirection = (transform.position - SpottedSlime.transform.position).normalized;
+            MoveNPC(MovementDirection);
+        }
+    }
+    protected virtual void ChaseState()
+    {
+        //Chase the slime at high speeds or stop chasing and go back to idle
+        if (CheckForSlime() == true)
+        {
+            SpeedMultiplier = RunSpeed;
+            MovementDirection = (SpottedSlime.transform.position - transform.position).normalized;
+            MoveNPC(MovementDirection);
+        }
+        else
+        {
+            GetComponent<ActivatePrompt>().HideEmotion();
+            ChangeState(StateMachine.IDLE);
+            EntityRigidBody.velocity = Vector2.zero;
+        }
+    }
     public Vector2 FindDirection()
     {
-        Vector2 target = NPCManager.instance.FindPointForMyZone(this);
-        return (target - rb.position).normalized;
+        Vector2 Target = NPCManager.Instance.FindPointForMyZone(this);
+        Vector2 Direction = (Target - EntityRigidBody.position).normalized;
+        return Direction;
     }
 
     protected void ChangeState(StateMachine state)
     {
-        myState = state;
-        lastStep = Time.time;
+        MyState = state;
+        LastStep = Time.time;
     }
 
-    protected void MoveNPC(Vector2 dir)
+    /// <summary>
+    /// Move based on RigidBody velocity
+    /// </summary>
+    protected void MoveNPC(Vector2 Direction)
     {
-        rb.velocity = Vector2.zero;
-        rb.velocity += new Vector2(dir.x, dir.y) * speed * 50 * Time.deltaTime;
+        EntityRigidBody.velocity = Vector2.zero;
+        EntityRigidBody.velocity += new Vector2(Direction.x, Direction.y) * SpeedMultiplier * 50 * Time.deltaTime;
     }
-
+    /// <summary>
+    /// Check that we have seen the slime and the slime is not hidden
+    /// </summary>
     protected bool CheckForSlime()
     {
-        spottedSlime = sight.PollForSeenObjectOfType<PlayerController>();
-        return spottedSlime != null && spottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false;
+        SpottedSlime = EntitySight.PollForSeenObjectOfType<PlayerController>();
+        bool SlimeAvailableToSpot = (SpottedSlime != null) && (SpottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false);
+        return SlimeAvailableToSpot;
+    }
+
+    public void ResetNPC()
+    {
+        ChangeState(StateMachine.IDLE);
+        this.gameObject.SetActive(true);
     }
 }

@@ -128,17 +128,18 @@ public class PlayerController : MonoBehaviour
             return;
         }
         // TODO this has an issue with PlayerController still being referenced after destruction
-        Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, InteractRadius, InteractLayer);
+        Collider2D[] InteractableCollisions = Physics2D.OverlapCircleAll(transform.position, InteractRadius, InteractLayer);
 
-        foreach (Collider2D col in colls)
+        foreach (Collider2D Colliders in InteractableCollisions)
         {
-            if (col.CompareTag("Killable"))
+
+            NPCBehaviour NPC;
+            if(Colliders.TryGetComponent(out NPC))
             {
                 BodyAnimator.SetTrigger("Consume");
-                transform.position = col.gameObject.transform.position;
-                NPCManager.instance.KillNPC(col.gameObject);
+                transform.position = NPC.gameObject.transform.position;
+                NPCManager.Instance.KillNPC(NPC);
                 GameManager.instance.UpdateScore();
-
                 return;
             }
         }
