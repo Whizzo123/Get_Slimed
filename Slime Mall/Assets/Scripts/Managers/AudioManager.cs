@@ -6,7 +6,12 @@ using System;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
-///Written by Tanapat Somrid
+/*
+*AUTHOR: Tanapat Somrid
+*EDITORS: Tanapat Somrid
+*DATEOFCREATION: dd/mm/yyyy
+*DESCRIPTION: To provide a global access point to access pre-loaded sound files and play them from within the manager or from an outside object
+*/
 
 
 /// <summary>
