@@ -48,12 +48,12 @@ public class SecurityBehaviour : NPCBehaviour
         Collision.gameObject.TryGetComponent<PlayerController>(out PlayerController);
         if(PlayerController)
         {
-            if (PlayerController.IsSlimeHidden() == false)
+            if (!PlayerController.IsSlimeHidden() && !GameManager.Instance.IsGameFinished)
             {
                 //Disconnect player from input system
                 PlayerController.Cleanup();
                 //Send off a call to game manager
-                GameManager.instance.CapturedEndGame();
+                GameManager.Instance.CapturedEndGame();
             }
         }
     }

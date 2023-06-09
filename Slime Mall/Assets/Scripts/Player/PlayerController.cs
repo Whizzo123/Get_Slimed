@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        if(!GameManager.instance.IsGamePaused())
+        if(!GameManager.Instance.IsGamePaused)
         {
             //Get input for direction and sprinting
             MovementDirection = InputCallbacks.ReadValue<Vector2>();
@@ -139,14 +139,14 @@ public class PlayerController : MonoBehaviour
                 BodyAnimator.SetTrigger("Consume");
                 transform.position = NPC.gameObject.transform.position;
                 NPCManager.Instance.KillNPC(NPC);
-                GameManager.instance.UpdateScore();
+                GameManager.Instance.UpdateScore();
                 return;
             }
         }
     }
     void DoPause(InputAction.CallbackContext obj)
     {
-        GameManager.instance.PauseGame();
+        GameManager.Instance.PauseGame();
     }
     void DoInteract(InputAction.CallbackContext obj)
     {
