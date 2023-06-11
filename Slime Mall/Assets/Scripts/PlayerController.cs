@@ -3,17 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.AI;
+using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
     Controls input;
-    InputAction movement;
+    InputAction mouseXY;
     Animator animator;
-    Rigidbody2D rb;
-    BoxCollider2D boxCol;
     AudioSource audioSource;
-    Vector2 dir;
+    NavMeshAgent agent;
 
     SpriteRenderer sr;
 
@@ -48,17 +48,13 @@ public class PlayerController : MonoBehaviour
         else Destroy(this);
 
         input = new Controls();
-        rb = GetComponent<Rigidbody2D>();
-        boxCol = GetComponent<BoxCollider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+        agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
 
         checkArea.radius = interactRadius;
-
-        //Bind movement to an action
-        movement = input.Movement.Move;
-        movement.Enable();
 
         input.Movement.Interact.performed += DoInteract;
         input.Movement.Interact.Enable();
@@ -69,6 +65,12 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
+        input.Touch.MoveClick.performed += DoMoveOnClick;
+        input.Touch.MoveClick.Enable();
+
+        input.Touch.MoveTouch.performed += DoMoveOnTouch;
+        input.Touch.MoveTouch.Enable();
+
         originalMovespeed = moveSpeed;
         originalSprintDelay = sprintDelay;
     }
@@ -78,8 +80,6 @@ public class PlayerController : MonoBehaviour
     {
         if(!GameManager.instance.IsGamePaused())
         {
-            //Get dir
-            dir = movement.ReadValue<Vector2>();
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 sprintDelay = originalSprintDelay;
@@ -96,7 +96,6 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-
                 sprintDelay -= Time.deltaTime;
                 if (sprintDelay <= 0)
                 {
@@ -110,32 +109,24 @@ public class PlayerController : MonoBehaviour
                  moveSpeed = originalMovespeed;
             }
             UI.instance.ChangeSprintBar(speedJuice);
-            //Flip sprite based on dir
-            if (dir.x < 0)
-                sr.flipX = true;
-            else if (dir.x > 0)
-                sr.flipX = false;
         }
     }
 
-    private void FixedUpdate()
+    void DoMoveOnClick(InputAction.CallbackContext obj)
     {
-        ProcessInput();
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if(Physics.Raycast(ray, out RaycastHit hit))
+        {
+            agent.SetDestination(hit.point);
+        }
     }
 
-    void ProcessInput()
+    void DoMoveOnTouch(InputAction.CallbackContext obj)
     {
-        //Movement
-        if (isMovementEnabled)
+        Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            rb.velocity = Vector2.zero;
-            rb.velocity += new Vector2(dir.x, dir.y) * moveSpeed * 100 * Time.deltaTime;
-            animator.SetFloat("Horizontal", dir.x);
-            animator.SetFloat("Vertical", dir.y);
-        }
-        else
-        {
-            rb.velocity = Vector2.zero;
+            agent.SetDestination(hit.point);
         }
     }
 
@@ -321,5 +312,11 @@ public class PlayerController : MonoBehaviour
 
         input.Movement.Pause.performed -= DoPause;
         input.Movement.Pause.Disable();
+
+        input.Touch.MoveTouch.performed -= DoMoveOnTouch;
+        input.Touch.MoveTouch.Disable();
+
+        input.Touch.MoveClick.performed -= DoMoveOnClick;
+        input.Touch.MoveClick.Disable();
     }
 }
