@@ -198,6 +198,54 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Touch"",
+            ""id"": ""f922d9b6-cf16-4b68-a35b-26f44ab4e67c"",
+            ""actions"": [
+                {
+                    ""name"": ""MoveClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""ebbcad30-65f3-49ee-aee5-0e374d0d22c6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MoveTouch"",
+                    ""type"": ""Value"",
+                    ""id"": ""72169be9-a1e7-4d9c-ae0e-ca1c23209321"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""03410e0d-b283-4d97-9044-129a911f15c1"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5a668b30-39cb-4834-aee3-c21ca48c44f5"",
+                    ""path"": ""<Touchscreen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveTouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -208,6 +256,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Movement_Kill = m_Movement.FindAction("Kill", throwIfNotFound: true);
         m_Movement_Interact = m_Movement.FindAction("Interact", throwIfNotFound: true);
         m_Movement_Pause = m_Movement.FindAction("Pause", throwIfNotFound: true);
+        // Touch
+        m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
+        m_Touch_MoveClick = m_Touch.FindAction("MoveClick", throwIfNotFound: true);
+        m_Touch_MoveTouch = m_Touch.FindAction("MoveTouch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -335,11 +387,70 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         }
     }
     public MovementActions @Movement => new MovementActions(this);
+
+    // Touch
+    private readonly InputActionMap m_Touch;
+    private List<ITouchActions> m_TouchActionsCallbackInterfaces = new List<ITouchActions>();
+    private readonly InputAction m_Touch_MoveClick;
+    private readonly InputAction m_Touch_MoveTouch;
+    public struct TouchActions
+    {
+        private @Controls m_Wrapper;
+        public TouchActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MoveClick => m_Wrapper.m_Touch_MoveClick;
+        public InputAction @MoveTouch => m_Wrapper.m_Touch_MoveTouch;
+        public InputActionMap Get() { return m_Wrapper.m_Touch; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TouchActions set) { return set.Get(); }
+        public void AddCallbacks(ITouchActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TouchActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TouchActionsCallbackInterfaces.Add(instance);
+            @MoveClick.started += instance.OnMoveClick;
+            @MoveClick.performed += instance.OnMoveClick;
+            @MoveClick.canceled += instance.OnMoveClick;
+            @MoveTouch.started += instance.OnMoveTouch;
+            @MoveTouch.performed += instance.OnMoveTouch;
+            @MoveTouch.canceled += instance.OnMoveTouch;
+        }
+
+        private void UnregisterCallbacks(ITouchActions instance)
+        {
+            @MoveClick.started -= instance.OnMoveClick;
+            @MoveClick.performed -= instance.OnMoveClick;
+            @MoveClick.canceled -= instance.OnMoveClick;
+            @MoveTouch.started -= instance.OnMoveTouch;
+            @MoveTouch.performed -= instance.OnMoveTouch;
+            @MoveTouch.canceled -= instance.OnMoveTouch;
+        }
+
+        public void RemoveCallbacks(ITouchActions instance)
+        {
+            if (m_Wrapper.m_TouchActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITouchActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TouchActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TouchActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TouchActions @Touch => new TouchActions(this);
     public interface IMovementActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnKill(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+    }
+    public interface ITouchActions
+    {
+        void OnMoveClick(InputAction.CallbackContext context);
+        void OnMoveTouch(InputAction.CallbackContext context);
     }
 }

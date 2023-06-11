@@ -18,13 +18,13 @@ public class OrderInLayer : MonoBehaviour
         {
             if (TryGetComponent<SpriteRenderer>(out SpriteRenderer SR)) sprite = SR;
         }
-        sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y + yOffset);
+        sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.z + yOffset);
     }
 
     void Update()
     {
         if (isSortingUpdating)
-            sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.y + yOffset);
+            sprite.sortingOrder = (int)Mathf.Round(sprite.transform.position.z + yOffset);
         else
             DestroyImmediate(this);
     }
