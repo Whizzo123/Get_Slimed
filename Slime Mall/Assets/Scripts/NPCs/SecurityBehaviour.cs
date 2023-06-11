@@ -4,79 +4,56 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+/*
+*AUTHOR: Unknown
+*EDITORS: Tanapat Somrid
+*DATEOFCREATION: dd/mm/yyyy
+*DESCRIPTION: Description of file and usage
+*/
 
 
 public class SecurityBehaviour : NPCBehaviour
 {
 
-    public override void UpdateStateMachine()
+    protected override void UpdateStateMachine()
     {
-        switch (myState)
+        switch (MyState)
         {
             case StateMachine.IDLE:
-                if (CheckForSlime() == true)
                 {
-                    GetComponent<ActivatePrompt>().ShowEmotion();
-                    ChangeState(StateMachine.SIGHT);
+                    IdleState();
+                    break;
                 }
-                //Idle enough
-                else if (Time.time >= lastStep + idleTime)
-                {
-                    dir = FindDirection();
-                    ChangeState(StateMachine.WANDER);
-                }
-                break;
-
             case StateMachine.WANDER:
-                MoveNPC(dir);
-                if(CheckForSlime() == true)
                 {
-                    GetComponent<ActivatePrompt>().ShowEmotion();
-                    ChangeState(StateMachine.SIGHT);
+                    WanderState();
+                    break;
                 }
-                else if (Time.time >= lastStep + wanderTime)
-                {
-                    dir = Vector2.zero;
-                    rb.velocity = Vector2.zero;
-                    ChangeState(StateMachine.IDLE);
-                }
-                break;
             case StateMachine.SIGHT:
-                    speed = 5.0f;
-                AudioManager.instance.PlaySoundFromSource(spotSoundIdentifier, audioSource);
-                ChangeState(StateMachine.CHASE);
-
-                break;
+                {
+                    SightState(StateMachine.CHASE);
+                    break;
+                }
             case StateMachine.CHASE:
-                // Have we seen the slime and is he not hidden
-                if(CheckForSlime() == true)
                 {
-                    dir = (spottedSlime.transform.position - transform.position).normalized;
-                    MoveNPC(dir);
+                    ChaseState();
+                    break;
                 }
-                else
-                {
-                    GetComponent<ActivatePrompt>().HideEmotion();
-                    speed = 2.0f;
-                    ChangeState(StateMachine.IDLE);
-                    rb.velocity = Vector2.zero;
-                }
-                break;
         }
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void OnCollisionEnter2D(Collision2D Collision)
     {
-        PlayerController playerController;
-        collision.gameObject.TryGetComponent<PlayerController>(out playerController);
-        if(playerController)
+        PlayerController PlayerController;
+        Collision.gameObject.TryGetComponent<PlayerController>(out PlayerController);
+        if(PlayerController)
         {
-            if (playerController.IsSlimeHidden() == false)
+            if (!PlayerController.IsSlimeHidden() && !GameManager.Instance.IsGameFinished)
             {
                 //Disconnect player from input system
-                playerController.Cleanup();
+                PlayerController.Cleanup();
                 //Send off a call to game manager
-                GameManager.instance.CapturedEndGame();
+                GameManager.Instance.CapturedEndGame();
             }
         }
     }

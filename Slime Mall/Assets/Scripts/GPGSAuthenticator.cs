@@ -7,10 +7,14 @@ using GooglePlayGames.BasicApi;
 public class GPGSAuthenticator : MonoBehaviour
 {
 
+    public bool isWindows = true;
     // Start is called before the first frame update
     void Start()
     {
-        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);       
+        if (!isWindows)
+        {
+            PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+        }
 
     }
 

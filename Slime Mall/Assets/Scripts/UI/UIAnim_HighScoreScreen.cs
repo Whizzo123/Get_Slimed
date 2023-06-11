@@ -8,7 +8,8 @@ using System;
 
 public class UIAnim_HighScoreScreen : MonoBehaviour
 {
-    [SerializeField] private TMPro.TMP_Text Score, HighScore;
+    [SerializeField] private TMPro.TMP_Text Score;
+    [SerializeField] private TMPro.TMP_Text HighScore;
     [SerializeField] private GameObject[] BounceObjects;
 
     [SerializeField] private float ScaleTime;

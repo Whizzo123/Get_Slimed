@@ -66,7 +66,7 @@ public class UI : MonoBehaviour
     public void PlayButton(int index)
     {
         mainMenuScreen.SetActive(false);
-        GameManager.instance.LoadLevel(index);
+        GameManager.Instance.LoadLevel(index);
     }
 
     public void SettingsButton()
@@ -90,7 +90,7 @@ public class UI : MonoBehaviour
 
     public void QuitButton()
     {
-        GameManager.instance.Quit();
+        GameManager.Instance.Quit();
     }
 
     public void CapturedEnd(int score, int hiscore)
