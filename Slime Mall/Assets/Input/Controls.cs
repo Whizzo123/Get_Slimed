@@ -214,9 +214,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""MoveTouch"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""72169be9-a1e7-4d9c-ae0e-ca1c23209321"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -237,7 +237,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5a668b30-39cb-4834-aee3-c21ca48c44f5"",
-                    ""path"": ""<Touchscreen>/Press"",
+                    ""path"": ""<Touchscreen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

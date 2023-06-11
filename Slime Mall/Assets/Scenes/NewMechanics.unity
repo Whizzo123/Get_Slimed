@@ -148,7 +148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031697515829, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -393.90683
+      value: -393.90686
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031795766315, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchorMax.y
@@ -164,7 +164,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1179509031795766315, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -281.36203
+      value: -281.36206
       objectReference: {fileID: 0}
     - target: {fileID: 1179509032063011241, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_SizeDelta.x
@@ -318,6 +318,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 61
       objectReference: {fileID: 0}
+    - target: {fileID: 6717837841854005873, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 2.654789
+      objectReference: {fileID: 0}
+    - target: {fileID: 6717837841854005873, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 16.746765
+      objectReference: {fileID: 0}
     - target: {fileID: 8373457133040240391, guid: d337b8561bc57c44c930d8a3dde729f2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -354,15 +362,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NPCList:
-  - npc: {fileID: 11400000, guid: 6e44f82e48e299149bd52acb7e2df3c9, type: 2}
-    amount: 5
-  - npc: {fileID: 11400000, guid: 2f8931cb4317e8145b153add6395c5db, type: 2}
-    amount: 2
-  spawnAreas:
+  - NPCType: {fileID: 0}
+    Amount: 0
+  - NPCType: {fileID: 0}
+    Amount: 0
+  SpawnZones:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  NPCMoveSpeed: 1
 --- !u!4 &352012052
 Transform:
   m_ObjectHideFlags: 0
@@ -417,7 +424,7 @@ MonoBehaviour:
   m_Follow: {fileID: 899358289}
   m_Lens:
     FieldOfView: 60
-    OrthographicSize: 3
+    OrthographicSize: 5
     NearClipPlane: 0.01
     FarClipPlane: 1000
     Dutch: 0
@@ -441,7 +448,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 379238242}
   m_LocalRotation: {x: 0.70710677, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00000011920929, y: 10, z: -0.0000010430813}
+  m_LocalPosition: {x: -0.000000059604645, y: 10, z: -0.0000013411045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -605,7 +612,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -629,7 +636,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 887936879}
   m_LocalRotation: {x: 0.70710677, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00000011920929, y: 10, z: -0.0000010430813}
+  m_LocalPosition: {x: -0.000000059604645, y: 10, z: -0.0000013411045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -713,7 +720,7 @@ GameObject:
   m_Component:
   - component: {fileID: 899358289}
   - component: {fileID: 899358290}
-  - component: {fileID: 899358293}
+  - component: {fileID: 899358295}
   - component: {fileID: 899358294}
   m_Layer: 0
   m_Name: Player
@@ -753,27 +760,6 @@ MonoBehaviour:
   sprite: {fileID: 1653260455}
   isSortingUpdating: 1
   yOffset: 0
---- !u!114 &899358293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 899358287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d17b45d19a440a409c4faab9594c2bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 10
-  sprintSpeed: 15
-  sprintDelay: 2
-  interactLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  interactRadius: 2
-  checkArea: {fileID: 1653260454}
-  isVisible: 1
 --- !u!195 &899358294
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -796,6 +782,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &899358295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899358287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bcd7f266f4816b4391eba4667e41a98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  sprintSpeed: 15
+  sprintDelay: 2
+  interactLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  interactRadius: 1
+  checkArea: {fileID: 1653260454}
+  isVisible: 1
 --- !u!1 &924931146
 GameObject:
   m_ObjectHideFlags: 3

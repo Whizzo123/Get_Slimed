@@ -2,167 +2,144 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using static PlayerController;
+using UnityEngine.AI;
+
 /*
-*AUTHOR: Antonio Vilalta Isidro
+*AUTHOR: Antonio Villalta Isidro
 *EDITORS: Tanapat Somrid
 *DATEOFCREATION: NA
 *DESCRIPTION: 
 */
+
 public class PlayerController : MonoBehaviour
 {
-    public static PlayerController Instance;
+    public static PlayerController instance;
     [Header("Components")]
-    Controls PlayerInput;
-    InputAction InputCallbacks;
-    Animator BodyAnimator;
-    Rigidbody2D PlayerRigidBody;
-    BoxCollider2D BodyCollider;
-    AudioSource PlayerAudioSource;
-    SpriteRenderer BodyRenderer;
+    Controls input;
+    Animator animator;
+    AudioSource audioSource;
+    NavMeshAgent agent;
+
+    SpriteRenderer sr;
+    Vector3 dir;
 
     [Header("Movement")]
-    [SerializeField][Range(1f, 100f)] [Tooltip("Movement Speed")] 
-    float MoveSpeed = 5f;
-    [SerializeField][Range(1f, 100f)][Tooltip("Sprinting Speed")] 
-    float SprintSpeed = 15.0f;
-    [SerializeField][Range(1f, 10f)][Tooltip("Delay before recharging the Sprint Time after sprint is used")] 
-    float SprintDelay = 2.0f;
-    float SprintDelayTime;
-    float SprintTime = 3;
-    float SpeedModifier;
+    [SerializeField, Range(1f, 100f), Tooltip("Movement speed")]
+    float moveSpeed = 5f;
     bool bIsMovementEnabled = true;
-    Vector2 MovementDirection = new Vector2(0, 0);
 
     [Header("Inteactions")]
-    [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask InteractLayer;
-    [SerializeField][Range(0,5f)][Tooltip("Radius that player can trigger interact objects")] float InteractRadius = 1f;
-    CircleCollider2D InteractCircle;
-    HidingObject ObjectHidingIn;
+    [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask interactLayer;
+    [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
+    CircleCollider2D interactCircle;
+    HidingObject objectHidingIn;
     bool bIsInteractEnabled = true;
-
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this);
-        }
+        if (instance == null) instance = this;
+        else Destroy(this);
 
         //References
-        PlayerInput = new Controls();
-        
-        PlayerRigidBody = GetComponent<Rigidbody2D>();
-        BodyCollider = GetComponent<BoxCollider2D>();
-        BodyAnimator = GetComponent<Animator>();
-        PlayerAudioSource = GetComponent<AudioSource>();
-        BodyRenderer = GetComponentInChildren<SpriteRenderer>();
-        InteractCircle = GetComponentInChildren<CircleCollider2D>();
+        input = new Controls();
+        sr = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        interactCircle = GetComponentInChildren<CircleCollider2D>();
+        agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
 
         //Variables
-        InteractCircle.radius = InteractRadius;
-        SprintTime = SprintDelay;
+        interactCircle.radius = interactRadius;
 
         //Bind movement to an action
-        InputCallbacks = PlayerInput.Movement.Move;
-        InputCallbacks.Enable();
+        input.Movement.Interact.performed += DoInteract;
+        input.Movement.Interact.Enable();
 
-        PlayerInput.Movement.Interact.performed += DoInteract;
-        PlayerInput.Movement.Interact.Enable();
+        input.Movement.Kill.performed += DoKill;
+        input.Movement.Kill.Enable();
 
-        PlayerInput.Movement.Kill.performed += DoKill;
-        PlayerInput.Movement.Kill.Enable();
+        input.Movement.Pause.performed += DoPause;
+        input.Movement.Pause.Enable();
 
-        PlayerInput.Movement.Pause.performed += DoPause;
-        PlayerInput.Movement.Pause.Enable();
+        input.Touch.MoveClick.performed += DoMoveOnClick;
+        input.Touch.MoveClick.Enable();
 
+        input.Touch.MoveTouch.performed += DoMoveOnTouch;
+        input.Touch.MoveTouch.Enable();
     }
+
     public void Cleanup()
     {
-        PlayerInput.Movement.Interact.performed -= DoInteract;
-        PlayerInput.Movement.Interact.Disable();
+        input.Movement.Interact.performed -= DoInteract;
+        input.Movement.Interact.Disable();
 
-        PlayerInput.Movement.Kill.performed -= DoKill;
-        PlayerInput.Movement.Kill.Disable();
+        input.Movement.Kill.performed -= DoKill;
+        input.Movement.Kill.Disable();
 
-        PlayerInput.Movement.Pause.performed -= DoPause;
-        PlayerInput.Movement.Pause.Disable();
+        input.Movement.Pause.performed -= DoPause;
+        input.Movement.Pause.Disable();
+
+        input.Touch.MoveTouch.performed -= DoMoveOnTouch;
+        input.Touch.MoveTouch.Disable();
+
+        input.Touch.MoveClick.performed -= DoMoveOnClick;
+        input.Touch.MoveClick.Disable();
     }
+
+    // Update is called once per frame
     void Update()
     {
-        if(!GameManager.Instance.IsGamePaused)
+        if (!GameManager.Instance.IsGamePaused)
         {
-            //Get input for direction and sprinting
-            MovementDirection = InputCallbacks.ReadValue<Vector2>();
-            Sprint();
-
-            UI.instance.ChangeSprintBar(SprintTime);
-
+            dir = agent.destination - transform.position;
+            
             //Flip sprite based on direction
-            if (MovementDirection.x < 0)
+            if (dir.x < 0)
             {
-                BodyRenderer.flipX = true;
+                sr.flipX = true;
             }
-            else if (MovementDirection.x > 0)
+            else if (dir.x > 0)
             {
-                BodyRenderer.flipX = false;
+                sr.flipX = false;
             }
         }
     }
-    void FixedUpdate()
-    {
-        ProcessInput();
-    }
 
-    void DoKill(InputAction.CallbackContext obj)
+    void DoMoveOnClick(InputAction.CallbackContext obj)
     {
-        // If the slime is hiding don't let them kill an NPC
-        if (IsSlimeHidden() == true)
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if(Physics.Raycast(ray, out RaycastHit hit))
         {
-            return;
-        }
-        // TODO this has an issue with PlayerController still being referenced after destruction
-        Collider2D[] InteractableCollisions = Physics2D.OverlapCircleAll(transform.position, InteractRadius, InteractLayer);
-
-        foreach (Collider2D Colliders in InteractableCollisions)
-        {
-
-            NPCBehaviour NPC;
-            if(Colliders.TryGetComponent(out NPC))
-            {
-                BodyAnimator.SetTrigger("Consume");
-                transform.position = NPC.gameObject.transform.position;
-                NPCManager.Instance.KillNPC(NPC);
-                GameManager.Instance.UpdateScore();
-                return;
-            }
+            agent.SetDestination(hit.point);
         }
     }
-    void DoPause(InputAction.CallbackContext obj)
+
+    void DoMoveOnTouch(InputAction.CallbackContext obj)
     {
-        GameManager.Instance.PauseGame();
+        Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            agent.SetDestination(hit.point);
+        }
     }
+
     void DoInteract(InputAction.CallbackContext obj)
     {
         // Interact is disabled while in the middle of interacting want to prevent spamming 'E'
         if (bIsInteractEnabled)
         {
             //If we are already hiding in an object we will exit
-            if (ObjectHidingIn)
+            if (objectHidingIn)
             {
-                ExitHidingObject(ObjectHidingIn);
+                ExitHidingObject(objectHidingIn);
                 return;
             }
             else
             {
                 // Are we within the radius of interacting with the HidingObject?
-                Collider2D[] Collisions = Physics2D.OverlapCircleAll(transform.position, InteractRadius, InteractLayer);
+                Collider2D[] Collisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
                 foreach (Collider2D ValidCollision in Collisions)
                 {
                     HidingObject NewHidingObject = null;
@@ -175,71 +152,68 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    void DoKill(InputAction.CallbackContext obj)
+    {
+        // If the slime is hiding don't let them kill an NPC
+        if (IsSlimeHidden() == true)
+        {
+            return;
+        }
+        // TODO this has an issue with PlayerController still being referenced after destruction
+        Collider2D[] InteractableCollisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
+
+        foreach (Collider2D Colliders in InteractableCollisions)
+        {
+            NPCBehaviour NPC;
+            if (Colliders.TryGetComponent(out NPC))
+            {
+                animator.SetTrigger("Consume");
+                transform.position = NPC.gameObject.transform.position;
+                NPCManager.Instance.KillNPC(NPC);
+                GameManager.Instance.UpdateScore();
+                return;
+            }
+        }
+    }
+
+    void DoPause(InputAction.CallbackContext obj)
+    {
+        GameManager.Instance.PauseGame();
+    }
+
     public bool IsSlimeHidden()
     {
-        return (ObjectHidingIn);
+        return (objectHidingIn);
     }
 
     public void FreezePlayer()
     {
         bIsMovementEnabled = false;
-        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
+        agent.isStopped = true;
+        agent.enabled = false;
     }
 
-
-    
-    void ProcessInput()
+    private void UnFreezePlayer()
     {
-        //Movement
-        if (bIsMovementEnabled)
-        {
-            PlayerRigidBody.velocity = Vector2.zero;
-            PlayerRigidBody.velocity += new Vector2(MovementDirection.x, MovementDirection.y) * SpeedModifier * 100 * Time.deltaTime;
-            BodyAnimator.SetFloat("Horizontal", MovementDirection.x);
-            BodyAnimator.SetFloat("Vertical", MovementDirection.y);
-        }
-        else
-        {
-            PlayerRigidBody.velocity = Vector2.zero;
-        }
-    }
-    void Sprint()
-    {
-        if (Input.GetKey(KeyCode.LeftShift) && SprintTime > 0)
-        {
-            SprintDelayTime = SprintDelay;//Sprint delay is reset everytime we sprint
-            SprintTime -= Time.deltaTime;
-            SpeedModifier = SprintSpeed;
-        }
-        else
-        {
-            SpeedModifier = MoveSpeed;
-            //Tick sprint delay time down before we start recharging SprintTime
-            SprintDelayTime -= Time.deltaTime;
-            if (SprintDelayTime <= 0)
-            {
-                SprintTime += Time.deltaTime;
-                if (SprintTime >= 3)
-                {
-                    SprintTime = 3;
-                }
-            }
-
-        }
+        bIsMovementEnabled = true;
+        agent.isStopped = false;
+        agent.enabled = true;
     }
 
     #region INTERACTING
+
     void EnterHidingObject(HidingObject NewHidingObject)
     {
-        if (!BodyAnimator.GetBool(NewHidingObject.GetAnimationBool()))
+        if (!animator.GetBool(NewHidingObject.GetAnimationBool()))
         {
             //Animation
-            BodyAnimator.SetTrigger(NewHidingObject.GetAnimationTrigger());
-            BodyAnimator.SetBool(NewHidingObject.GetAnimationBool(), true);
+            animator.SetTrigger(NewHidingObject.GetAnimationTrigger());
+            animator.SetBool(NewHidingObject.GetAnimationBool(), true);
             //Disable Sprite renderer for HidingObject and Enter it
             NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
             NewHidingObject.EnteredObject(this);
-            ObjectHidingIn = NewHidingObject;
+            objectHidingIn = NewHidingObject;
             //Disable movement
             bIsInteractEnabled = false;
             FreezePlayer();
@@ -251,18 +225,18 @@ public class PlayerController : MonoBehaviour
     }
     void ExitHidingObject(HidingObject CurrentHidingObject)
     {
-        if (BodyAnimator.GetBool(CurrentHidingObject.GetAnimationBool()))
-        { 
+        if (animator.GetBool(CurrentHidingObject.GetAnimationBool()))
+        {
             bIsInteractEnabled = false;
-            BodyAnimator.SetBool(CurrentHidingObject.GetAnimationBool(), false);
+            animator.SetBool(CurrentHidingObject.GetAnimationBool(), false);
             CurrentHidingObject.ExitedObject();
         }
 
     }
     public void E_ExitedHidingObject()
     {
-        ObjectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
-        ObjectHidingIn = null;
+        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        objectHidingIn = null;
         //Enable movement
         UnFreezePlayer();
         bIsInteractEnabled = true;
@@ -270,39 +244,32 @@ public class PlayerController : MonoBehaviour
     public void TeleportToNextHidingObject(HidingObject NewHidingObject)
     {
         //Cleanup old HidingObject
-        ObjectHidingIn.ExitedObject();
-        ObjectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        objectHidingIn.ExitedObject();
+        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
 
         //Start new HidingObject
         this.transform.position = NewHidingObject.transform.position;
         NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
         NewHidingObject.EnteredObject(this);
-        ObjectHidingIn = NewHidingObject;
+        objectHidingIn = NewHidingObject;
 
     }
-
 
     public void E_InteractSound()
     {
-        AudioManager.instance.PlaySoundFromSource("Interact", PlayerAudioSource);
+        AudioManager.instance.PlaySoundFromSource("Interact", audioSource);
     }
+
     #endregion
+
     public void E_ConsumeSound()
     {
-        AudioManager.instance.PlaySoundFromSource("Consume", PlayerAudioSource);
+        AudioManager.instance.PlaySoundFromSource("Consume", audioSource);
     }
 
-    private void UnFreezePlayer()
+    private void OnDrawGizmos()
     {
-        bIsMovementEnabled = true;
-        GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, interactRadius);
     }
-
-
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawWireSphere(transform.position, InteractRadius);
-    //}
 }

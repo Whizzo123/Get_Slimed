@@ -56,6 +56,6 @@ public class HidingObject : MonoBehaviour
     [ContextMenu("Test Adding Player")]
     void TestAddingPlayer()
     {
-        EnteredObject(PlayerController.Instance);
+        EnteredObject(PlayerController.instance);
     }
 }

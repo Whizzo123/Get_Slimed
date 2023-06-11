@@ -33,7 +33,7 @@ public class TeleportArrow : MonoBehaviour
             TeleportEvent = new TeleportToNewHidingObject();
         }
 
-        TeleportEvent.AddListener(playerController.TeleportToNextHidingObject);
+        //TeleportEvent.AddListener(playerController.TeleportToNextHidingObject);
     }
     public void UnsubscribeToArrows()
     {
