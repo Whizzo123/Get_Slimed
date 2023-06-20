@@ -29,16 +29,43 @@ public class SecurityBehaviour : NPCBehaviour
                     WanderState();
                     break;
                 }
-            case StateMachine.SIGHT:
-                {
-                    SightState(StateMachine.CHASE);
-                    break;
-                }
             case StateMachine.CHASE:
                 {
                     ChaseState();
                     break;
                 }
+        }
+    }
+
+    protected override void IdleState()
+    {
+        SpeedMultiplier = BaseSpeed;
+        if (CheckForSlime() == true)
+        {
+            GetComponent<ActivatePrompt>().ShowEmotion();
+            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+            ChangeState(StateMachine.CHASE);
+        }
+        else if (Time.time >= LastStep + IdleTime)
+        {
+            agent.SetDestination(FindDirection());
+            ChangeState(StateMachine.WANDER);
+        }
+    }
+
+    protected override void WanderState() 
+    {
+        SpeedMultiplier = BaseSpeed;
+        if (CheckForSlime() == true)
+        {
+            GetComponent<ActivatePrompt>().ShowEmotion();
+            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+            ChangeState(StateMachine.CHASE);
+        }
+        if (Time.time >= LastStep + WanderTime || agent.isStopped)
+        {
+            agent.destination = transform.position;
+            ChangeState(StateMachine.IDLE);
         }
     }
 

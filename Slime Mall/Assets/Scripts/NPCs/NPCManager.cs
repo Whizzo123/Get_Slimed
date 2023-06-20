@@ -38,12 +38,12 @@ public class NPCManager : MonoBehaviour
         SpawnNPCs();
     }
 
-    public Vector2 FindPointForMyZone(NPCBehaviour npc)
+    public Vector3 FindPointForMyZone(NPCBehaviour npc)
     {
         int zone = NPCInZone[npc];
         float movePointX = Random.Range(SpawnZones[zone].bounds.min.x, SpawnZones[zone].bounds.max.x);
         float movePointY = Random.Range(SpawnZones[zone].bounds.min.y, SpawnZones[zone].bounds.max.y);
-        return new Vector2(movePointX, movePointY);
+        return new Vector3(movePointX, 0, movePointY);
     }
 
     public void SpawnNPCs()
@@ -86,7 +86,7 @@ public class NPCManager : MonoBehaviour
         Vector2 NewPoint = GetRandomPointInZone(NewSpawnZone);
 
         //Move NPC and ready it
-        NPCToMove.transform.position = new Vector2(NewPoint.x, NewPoint.y);
+        NPCToMove.transform.position = new Vector3(NewPoint.x, 0, NewPoint.y);
         NPCToMove.ResetNPC();
 
     }
@@ -111,6 +111,6 @@ public class NPCManager : MonoBehaviour
     {
         float SpawnPointX = Random.Range(SpawnZones[Zone].bounds.min.x, SpawnZones[Zone].bounds.max.x);
         float SpawnPointY = Random.Range(SpawnZones[Zone].bounds.min.y, SpawnZones[Zone].bounds.max.y);
-        return new Vector2(SpawnPointX, SpawnPointY);
+        return new Vector3(SpawnPointX, 0, SpawnPointY);
     }
 }
