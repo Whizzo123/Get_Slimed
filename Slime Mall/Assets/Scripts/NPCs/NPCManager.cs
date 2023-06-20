@@ -23,7 +23,7 @@ public class NPCManager : MonoBehaviour
 
     public List<NPC> NPCList;
     Dictionary<NPCBehaviour, int> NPCInZone = new Dictionary<NPCBehaviour, int>();
-    public BoxCollider2D[] SpawnZones = new BoxCollider2D[3];
+    public BoxCollider[] SpawnZones = new BoxCollider[3];
 
     void Awake()
     {
@@ -42,8 +42,8 @@ public class NPCManager : MonoBehaviour
     {
         int zone = NPCInZone[npc];
         float movePointX = Random.Range(SpawnZones[zone].bounds.min.x, SpawnZones[zone].bounds.max.x);
-        float movePointY = Random.Range(SpawnZones[zone].bounds.min.y, SpawnZones[zone].bounds.max.y);
-        return new Vector3(movePointX, 0, movePointY);
+        float movePointZ = Random.Range(SpawnZones[zone].bounds.min.z, SpawnZones[zone].bounds.max.z);
+        return new Vector3(movePointX, 0, movePointZ);
     }
 
     public void SpawnNPCs()
@@ -55,7 +55,7 @@ public class NPCManager : MonoBehaviour
             {
                 //Get random points and zones
                 int RandomSpawn = Random.Range(0, SpawnZones.Length);
-                Vector2 SpawnPoint = GetRandomPointInZone(RandomSpawn);
+                Vector3 SpawnPoint = GetRandomPointInZone(RandomSpawn);
 
                 //Spawn new NPC
                 GameObject NewNPC = Instantiate(NPCList[i].NPCType.NpcPrefab, SpawnPoint, Quaternion.identity, transform);
@@ -83,10 +83,10 @@ public class NPCManager : MonoBehaviour
     {
         //Get random other spawn
         int NewSpawnZone = GetRandomSpawnZone(OriginalZone);
-        Vector2 NewPoint = GetRandomPointInZone(NewSpawnZone);
+        Vector3 NewPoint = GetRandomPointInZone(NewSpawnZone);
 
         //Move NPC and ready it
-        NPCToMove.transform.position = new Vector3(NewPoint.x, 0, NewPoint.y);
+        NPCToMove.transform.position = NewPoint;
         NPCToMove.ResetNPC();
 
     }
@@ -107,10 +107,10 @@ public class NPCManager : MonoBehaviour
         Debug.Log("Returned:" + NewSpawnZone);
         return NewSpawnZone;
     }
-    private Vector2 GetRandomPointInZone(int Zone)
+    private Vector3 GetRandomPointInZone(int Zone)
     {
         float SpawnPointX = Random.Range(SpawnZones[Zone].bounds.min.x, SpawnZones[Zone].bounds.max.x);
-        float SpawnPointY = Random.Range(SpawnZones[Zone].bounds.min.y, SpawnZones[Zone].bounds.max.y);
-        return new Vector3(SpawnPointX, 0, SpawnPointY);
+        float SpawnPointZ = Random.Range(SpawnZones[Zone].bounds.min.z, SpawnZones[Zone].bounds.max.z);
+        return new Vector3(SpawnPointX, 0, SpawnPointZ);
     }
 }
