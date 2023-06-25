@@ -106,6 +106,7 @@ public class PlayerController : MonoBehaviour
                 {
                     animator.SetTrigger("Consume");
                     agent.enabled = false;
+                    //anim?
                     transform.position = targetNPC.transform.position;
                     NPCManager.Instance.KillNPC(targetNPC);
                     GameManager.Instance.UpdateScore();
@@ -119,6 +120,7 @@ public class PlayerController : MonoBehaviour
                 //In range
                 if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
                 {
+                    agent.enabled = false;
                     EnterHidingObject(targetHS);
                     targetHS = null;
                 }
@@ -147,44 +149,7 @@ public class PlayerController : MonoBehaviour
         {
             //Create ray
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            //Check it hit something
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                //If we are hiding, leave
-                if (objectHidingIn)
-                {
-                    ExitHidingObject(objectHidingIn);
-                    //agent.SetDestination(hit.point);
-                    return;
-                }
-
-                //Check for npcs and hidding spots
-                Collider2D[] interactibles = Physics2D.OverlapCircleAll(transform.position, interactRadius / 2, interactLayer);
-                foreach (Collider2D col in interactibles)
-                {
-                    //Hiding spot
-                    if (col.TryGetComponent<HidingObject>(out HidingObject hs))
-                    {
-                        targetHS = hs;
-                        targetNPC = null;
-                        agent.SetDestination(targetHS.transform.position);
-                        return;
-                    }
-
-                    //NPC
-                    else if (col.TryGetComponent<NPCBehaviour>(out NPCBehaviour npc))
-                    {
-                        targetNPC = npc;
-                        targetHS = null;
-                        agent.SetDestination(targetNPC.transform.position);
-                        return;
-                    }
-                }
-                //Ground is the target
-                agent.SetDestination(hit.point);
-                targetNPC = null;
-                targetHS = null;
-            }
+            Move(ray);           
         }
     }
 
@@ -195,44 +160,48 @@ public class PlayerController : MonoBehaviour
         {
             //Create ray
             Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
-            //Check it hit something
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            Move(ray);
+        }
+    }
+
+    void Move(Ray r)
+    {
+        //Check it hit something
+        if (Physics.Raycast(r, out RaycastHit hit))
+        {
+            //If we are hiding, leave
+            if (objectHidingIn)
             {
-                //If we are hiding, leave
-                if (objectHidingIn)
+                ExitHidingObject(objectHidingIn);
+                agent.enabled = true;
+            }
+
+            //Check for npcs and hidding spots
+            Collider[] interactibles = Physics.OverlapSphere(hit.transform.position, interactRadius / 2, interactLayer);
+            foreach (Collider col in interactibles)
+            {
+                //Hiding spot
+                if (col.TryGetComponent<HidingObject>(out HidingObject hs))
                 {
-                    ExitHidingObject(objectHidingIn);
-                    //agent.SetDestination(hit.point);
+                    targetHS = hs;
+                    targetNPC = null;
+                    agent.SetDestination(targetHS.transform.position);
                     return;
                 }
 
-                //Check for npcs and hidding spots
-                Collider2D[] interactibles = Physics2D.OverlapCircleAll(transform.position, interactRadius / 2, interactLayer);
-                foreach (Collider2D col in interactibles)
+                //NPC
+                else if (col.TryGetComponent<NPCBehaviour>(out NPCBehaviour npc))
                 {
-                    //Hiding spot
-                    if (col.TryGetComponent<HidingObject>(out HidingObject hs))
-                    {
-                        targetHS = hs;
-                        targetNPC = null;
-                        agent.SetDestination(targetHS.transform.position);
-                        return;
-                    }
-
-                    //NPC
-                    else if (col.TryGetComponent<NPCBehaviour>(out NPCBehaviour npc))
-                    {
-                        targetNPC = npc;
-                        targetHS = null;
-                        agent.SetDestination(targetNPC.transform.position);
-                        return;
-                    }
+                    targetNPC = npc;
+                    targetHS = null;
+                    agent.SetDestination(targetNPC.transform.position);
+                    return;
                 }
-                //Ground is the target
-                agent.SetDestination(hit.point);
-                targetNPC = null;
-                targetHS = null;
             }
+            //Ground is the target
+            agent.SetDestination(hit.point);
+            targetNPC = null;
+            targetHS = null;
         }
     }
 
@@ -327,7 +296,7 @@ public class PlayerController : MonoBehaviour
             objectHidingIn = NewHidingObject;
             //Disable movement
             bIsInteractEnabled = false;
-            FreezePlayer();
+            //FreezePlayer();
             //Reposition
             Vector3 DirectionFacingBin = NewHidingObject.transform.position - transform.position;
             transform.position = NewHidingObject.transform.position + (DirectionFacingBin.normalized) / 4;

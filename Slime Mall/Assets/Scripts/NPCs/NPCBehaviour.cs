@@ -20,6 +20,7 @@ public class NPCBehaviour : MonoBehaviour
     //protected float Radius;
     [Header("Components")]
     protected AudioSource AudioSource;
+    [SerializeField]
     protected SpriteRenderer EntitySpriteRenderer;
     protected NavMeshAgent agent;
     protected Animator EntityAnimator;
@@ -45,7 +46,7 @@ public class NPCBehaviour : MonoBehaviour
     void Awake()
     {
         AudioSource = GetComponent<AudioSource>();
-        EntitySpriteRenderer = GetComponent<SpriteRenderer>();
+        //EntitySpriteRenderer = GetComponent<SpriteRenderer>();
         EntityAnimator = GetComponent<Animator>();
         EntitySight = GetComponent<NPCSightComponent>();
 
