@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 /*
 *AUTHOR: Tanapat Somrid
-*EDITORS:
+*EDITORS: Antonio Villalta
 *DATEOFCREATION: 05/06/2023
 *DESCRIPTION: The Teleport arrow will contain the corresponding HidingObject that, once this arrow is pressed, the player will teleport to.
 *   It does this via callback functions with UnityEvents.

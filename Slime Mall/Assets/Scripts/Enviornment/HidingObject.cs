@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 /*
 *AUTHOR: Tanapat Somrid
-*EDITORS:
+*EDITORS: Antonio Villalta
 *DATEOFCREATION: 05/06/2023
 *DESCRIPTION: The HidingObject is any GameObject in which the player can hide inside. 
 *   If there are no arrows provided, it is a still hiding object and the player cannot teleport. 
@@ -19,14 +19,17 @@ public class HidingObject : MonoBehaviour
     {
         return TeleportingArrows;
     }
+
     public string GetAnimationTrigger() 
     { 
         return ("Enter" + ObjectAnimationIdentifier); 
     }
+
     public string GetAnimationBool() 
     { 
         return ObjectAnimationIdentifier; 
     }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +38,7 @@ public class HidingObject : MonoBehaviour
             Arrow.gameObject.SetActive(!Arrow.gameObject.activeInHierarchy);
         }
     }
+
     public void EnteredObject(PlayerController Player)
     {
         foreach (TeleportArrow Arrow in TeleportingArrows)
@@ -43,6 +47,7 @@ public class HidingObject : MonoBehaviour
             Arrow.SubscribeToArrows(Player);
         }
     }
+
     public void ExitedObject()
     {
         foreach (TeleportArrow Arrow in TeleportingArrows)
@@ -51,7 +56,6 @@ public class HidingObject : MonoBehaviour
             Arrow.gameObject.SetActive(false);
         }
     }
-
 
     [ContextMenu("Test Adding Player")]
     void TestAddingPlayer()

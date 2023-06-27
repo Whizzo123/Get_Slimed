@@ -30,14 +30,11 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField, Range(1f, 100f), Tooltip("Movement speed")]
     float moveSpeed = 5f;
-    bool bIsMovementEnabled = true;
 
-    [Header("Inteactions")]
+    [Header("Interactions")]
     [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask interactLayer;
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
-    CircleCollider2D interactCircle;
     bool bIsHidden = false;
-    bool bIsInteractEnabled = true;
 
     void Awake()
     {
@@ -49,12 +46,10 @@ public class PlayerController : MonoBehaviour
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        interactCircle = GetComponentInChildren<CircleCollider2D>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
 
         //Variables
-        interactCircle.radius = interactRadius;
 
         //Bind input to action
         input.Movement.Pause.performed += DoPause;
@@ -92,14 +87,7 @@ public class PlayerController : MonoBehaviour
                 //In range
                 if(Vector3.Distance(transform.position, targetNPC.transform.position) <= interactRadius)
                 {
-                    animator.SetTrigger("Consume");
-                    agent.enabled = false;
-                    //anim?
-                    transform.position = targetNPC.transform.position;
-                    NPCManager.Instance.KillNPC(targetNPC);
-                    GameManager.Instance.UpdateScore();
-                    agent.enabled = true;
-                    targetNPC = null;
+                    KillNPC();
                 }
             }
 
@@ -108,9 +96,7 @@ public class PlayerController : MonoBehaviour
                 //In range
                 if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
                 {
-                    agent.enabled = false;
                     EnterHidingObject();
-                    targetHS = null;
                 }
             }
 
@@ -132,24 +118,16 @@ public class PlayerController : MonoBehaviour
 
     void DoMoveOnClick(InputAction.CallbackContext obj)
     {
-        //If we can interact
-        if (bIsInteractEnabled)
-        {
-            //Create ray
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            Move(ray);           
-        }
+        //Create ray
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Move(ray);
     }
 
     void DoMoveOnTouch(InputAction.CallbackContext obj)
     {
-        //If we can interact
-        if (bIsInteractEnabled)
-        {
-            //Create ray
-            Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
-            Move(ray);
-        }
+        //Create ray
+        Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
+        Move(ray);
     }
 
     void Move(Ray r)
@@ -158,14 +136,13 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(r, out RaycastHit hit))
         {
             //If we are hiding, leave
-            if (targetHS)
+            if (bIsHidden)
             {
                 ExitHidingObject();
-                agent.enabled = true;
             }
 
             //Check for npcs and hidding spots
-            Collider[] interactibles = Physics.OverlapSphere(hit.transform.position, interactRadius / 2, interactLayer);
+            Collider[] interactibles = Physics.OverlapSphere(hit.transform.position, 1, interactLayer);
             foreach (Collider col in interactibles)
             {
                 //Hiding spot
@@ -200,24 +177,36 @@ public class PlayerController : MonoBehaviour
 
     public bool IsSlimeHidden()
     {
-        return (targetHS);
+        return (bIsHidden);
     }
 
     public void FreezePlayer()
     {
-        bIsMovementEnabled = false;
         agent.isStopped = true;
         agent.enabled = false;
     }
 
     private void UnFreezePlayer()
     {
-        bIsMovementEnabled = true;
         agent.isStopped = false;
         agent.enabled = true;
     }
 
     #region INTERACTING
+
+    void KillNPC()
+    {
+        animator.SetTrigger("Consume");
+
+        agent.enabled = false;
+        transform.position = targetNPC.transform.position;
+        agent.enabled = true;
+
+        NPCManager.Instance.KillNPC(targetNPC);
+        GameManager.Instance.UpdateScore();
+
+        targetNPC = null;
+    }
 
     void EnterHidingObject()
     {
@@ -226,37 +215,39 @@ public class PlayerController : MonoBehaviour
             //Animation
             animator.SetTrigger(targetHS.GetAnimationTrigger());
             animator.SetBool(targetHS.GetAnimationBool(), true);
+
             //Disable Sprite renderer for HidingObject and Enter it
             targetHS.GetComponent<SpriteRenderer>().enabled = false;
-            targetHS.EnteredObject(this);
-            //Disable movement
-            bIsInteractEnabled = false;
-            //FreezePlayer();
+            //targetHS.EnteredObject(this);
+
+            //Stop movement
+            agent.isStopped = true;
+
             //Reposition
-            Vector3 DirectionFacingBin = targetHS.transform.position - transform.position;
-            transform.position = targetHS.transform.position + (DirectionFacingBin.normalized) / 4;
-            bIsInteractEnabled = true;
+            agent.enabled = false;
+            transform.position = targetHS.transform.position + (dir.normalized) / 4;
+            agent.enabled = true;
+            bIsHidden = true;
         }
     }
     void ExitHidingObject()
     {
         if (animator.GetBool(targetHS.GetAnimationBool()))
         {
-            bIsInteractEnabled = false;
             animator.SetBool(targetHS.GetAnimationBool(), false);
-            targetHS.ExitedObject();
-            targetHS = null;
+            targetHS.GetComponent<SpriteRenderer>().enabled = true;
+            //targetHS.ExitedObject();           
         }
-
     }
     public void E_ExitedHidingObject()
     {
-        targetHS.GetComponent<SpriteRenderer>().enabled = true;
         targetHS = null;
+        bIsHidden = false;
+        agent.enabled = true;
         //Enable movement
         UnFreezePlayer();
-        bIsInteractEnabled = true;
     }
+
     public void TeleportToNextHidingObject(HidingObject NewHidingObject)
     {
         //Cleanup old HidingObject
@@ -276,12 +267,12 @@ public class PlayerController : MonoBehaviour
         AudioManager.instance.PlaySoundFromSource("Interact", audioSource);
     }
 
-    #endregion
-
     public void E_ConsumeSound()
     {
         AudioManager.instance.PlaySoundFromSource("Consume", audioSource);
     }
+
+    #endregion
 
     private void OnDrawGizmos()
     {
