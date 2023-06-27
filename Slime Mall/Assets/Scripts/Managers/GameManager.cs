@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour
     [Tooltip("How many points you gain per kill")] int KillScoreValue = 10;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different score
     [Tooltip("How much time you gain per kill")] int KillTimeValue = 1;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different time gain
 
-
     bool bIsGameFinished = false;
     public bool IsGameFinished
     {

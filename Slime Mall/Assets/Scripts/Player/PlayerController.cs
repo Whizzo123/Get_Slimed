@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask interactLayer;
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
     CircleCollider2D interactCircle;
-    HidingObject objectHidingIn;
+    bool bIsHidden = false;
     bool bIsInteractEnabled = true;
 
     void Awake()
@@ -56,13 +56,7 @@ public class PlayerController : MonoBehaviour
         //Variables
         interactCircle.radius = interactRadius;
 
-        //Bind movement to an action
-        input.Movement.Interact.performed += DoInteract;
-        input.Movement.Interact.Enable();
-
-        input.Movement.Kill.performed += DoKill;
-        input.Movement.Kill.Enable();
-
+        //Bind input to action
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
@@ -75,12 +69,6 @@ public class PlayerController : MonoBehaviour
 
     public void Cleanup()
     {
-        input.Movement.Interact.performed -= DoInteract;
-        input.Movement.Interact.Disable();
-
-        input.Movement.Kill.performed -= DoKill;
-        input.Movement.Kill.Disable();
-
         input.Movement.Pause.performed -= DoPause;
         input.Movement.Pause.Disable();
 
@@ -121,7 +109,7 @@ public class PlayerController : MonoBehaviour
                 if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
                 {
                     agent.enabled = false;
-                    EnterHidingObject(targetHS);
+                    EnterHidingObject();
                     targetHS = null;
                 }
             }
@@ -170,9 +158,9 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(r, out RaycastHit hit))
         {
             //If we are hiding, leave
-            if (objectHidingIn)
+            if (targetHS)
             {
-                ExitHidingObject(objectHidingIn);
+                ExitHidingObject();
                 agent.enabled = true;
             }
 
@@ -183,8 +171,8 @@ public class PlayerController : MonoBehaviour
                 //Hiding spot
                 if (col.TryGetComponent<HidingObject>(out HidingObject hs))
                 {
-                    targetHS = hs;
                     targetNPC = null;
+                    targetHS = hs;
                     agent.SetDestination(targetHS.transform.position);
                     return;
                 }
@@ -205,58 +193,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void DoInteract(InputAction.CallbackContext obj)
-    {
-        // Interact is disabled while in the middle of interacting want to prevent spamming 'E'
-        if (bIsInteractEnabled)
-        {
-            //If we are already hiding in an object we will exit
-            if (objectHidingIn)
-            {
-                ExitHidingObject(objectHidingIn);
-                return;
-            }
-            else
-            {
-                // Are we within the radius of interacting with the HidingObject?
-                Collider2D[] Collisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
-                foreach (Collider2D ValidCollision in Collisions)
-                {
-                    HidingObject NewHidingObject = null;
-                    if (ValidCollision.TryGetComponent<HidingObject>(out NewHidingObject))
-                    {
-                        EnterHidingObject(NewHidingObject);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    void DoKill(InputAction.CallbackContext obj)
-    {
-        // If the slime is hiding don't let them kill an NPC
-        if (IsSlimeHidden() == true)
-        {
-            return;
-        }
-        // TODO this has an issue with PlayerController still being referenced after destruction
-        Collider2D[] InteractableCollisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
-
-        foreach (Collider2D Colliders in InteractableCollisions)
-        {
-            NPCBehaviour NPC;
-            if (Colliders.TryGetComponent(out NPC))
-            {
-                animator.SetTrigger("Consume");
-                transform.position = NPC.gameObject.transform.position;
-                NPCManager.Instance.KillNPC(NPC);
-                GameManager.Instance.UpdateScore();
-                return;
-            }
-        }
-    }
-
     void DoPause(InputAction.CallbackContext obj)
     {
         GameManager.Instance.PauseGame();
@@ -264,7 +200,7 @@ public class PlayerController : MonoBehaviour
 
     public bool IsSlimeHidden()
     {
-        return (objectHidingIn);
+        return (targetHS);
     }
 
     public void FreezePlayer()
@@ -283,40 +219,40 @@ public class PlayerController : MonoBehaviour
 
     #region INTERACTING
 
-    void EnterHidingObject(HidingObject NewHidingObject)
+    void EnterHidingObject()
     {
-        if (!animator.GetBool(NewHidingObject.GetAnimationBool()))
+        if (!animator.GetBool(targetHS.GetAnimationBool()))
         {
             //Animation
-            animator.SetTrigger(NewHidingObject.GetAnimationTrigger());
-            animator.SetBool(NewHidingObject.GetAnimationBool(), true);
+            animator.SetTrigger(targetHS.GetAnimationTrigger());
+            animator.SetBool(targetHS.GetAnimationBool(), true);
             //Disable Sprite renderer for HidingObject and Enter it
-            NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
-            NewHidingObject.EnteredObject(this);
-            objectHidingIn = NewHidingObject;
+            targetHS.GetComponent<SpriteRenderer>().enabled = false;
+            targetHS.EnteredObject(this);
             //Disable movement
             bIsInteractEnabled = false;
             //FreezePlayer();
             //Reposition
-            Vector3 DirectionFacingBin = NewHidingObject.transform.position - transform.position;
-            transform.position = NewHidingObject.transform.position + (DirectionFacingBin.normalized) / 4;
+            Vector3 DirectionFacingBin = targetHS.transform.position - transform.position;
+            transform.position = targetHS.transform.position + (DirectionFacingBin.normalized) / 4;
             bIsInteractEnabled = true;
         }
     }
-    void ExitHidingObject(HidingObject CurrentHidingObject)
+    void ExitHidingObject()
     {
-        if (animator.GetBool(CurrentHidingObject.GetAnimationBool()))
+        if (animator.GetBool(targetHS.GetAnimationBool()))
         {
             bIsInteractEnabled = false;
-            animator.SetBool(CurrentHidingObject.GetAnimationBool(), false);
-            CurrentHidingObject.ExitedObject();
+            animator.SetBool(targetHS.GetAnimationBool(), false);
+            targetHS.ExitedObject();
+            targetHS = null;
         }
 
     }
     public void E_ExitedHidingObject()
     {
-        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
-        objectHidingIn = null;
+        targetHS.GetComponent<SpriteRenderer>().enabled = true;
+        targetHS = null;
         //Enable movement
         UnFreezePlayer();
         bIsInteractEnabled = true;
@@ -324,14 +260,14 @@ public class PlayerController : MonoBehaviour
     public void TeleportToNextHidingObject(HidingObject NewHidingObject)
     {
         //Cleanup old HidingObject
-        objectHidingIn.ExitedObject();
-        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        targetHS.ExitedObject();
+        targetHS.GetComponent<SpriteRenderer>().enabled = true;
 
         //Start new HidingObject
         this.transform.position = NewHidingObject.transform.position;
         NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
         NewHidingObject.EnteredObject(this);
-        objectHidingIn = NewHidingObject;
+        targetHS = NewHidingObject;
 
     }
 
