@@ -40,9 +40,9 @@ AnimationClip:
     - time: 0.75
       value: {fileID: 1920060278, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
     - time: 0.8333333
-      value: {fileID: 712546465, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
+      value: {fileID: 21300000, guid: 2bcd90818b5d3514ca9a61e449f71e2a, type: 3}
     attribute: m_Sprite
-    path: 
+    path: PlayerArea
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 60
@@ -53,7 +53,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 0
+      path: 145869151
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -70,7 +70,7 @@ AnimationClip:
     - {fileID: -1014217837, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
     - {fileID: 423619046, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
     - {fileID: 1920060278, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
-    - {fileID: 712546465, guid: 8233b49a4f9477d428b7a60272924642, type: 3}
+    - {fileID: 21300000, guid: 2bcd90818b5d3514ca9a61e449f71e2a, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -100,13 +100,6 @@ AnimationClip:
     functionName: E_InteractSound
     data: 
     objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.7
-    functionName: E_ExitedHidingObject
-    data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 8d17b45d19a440a409c4faab9594c2bb, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

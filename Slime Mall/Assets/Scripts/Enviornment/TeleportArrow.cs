@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 /*
 *AUTHOR: Tanapat Somrid
 *EDITORS: Antonio Villalta
@@ -13,31 +14,23 @@ using UnityEngine.Events;
 
 public class TeleportArrow : MonoBehaviour
 {
-    [SerializeField][Tooltip("Object that the arrow is pointing to")] HidingObject NextHidingObject;
+    [SerializeField][Tooltip("Object that the arrow is pointing to")] HidingObject HS;
+    SpriteRenderer sr;
+    Collider col;
 
-    //Should call when the sprite has been pressed
-    [ContextMenu("Has been pressed")]
-    public void InteractedWith()
+    void Start()
     {
-        TeleportEvent.Invoke(NextHidingObject);
+        sr = GetComponent<SpriteRenderer>();
+        sr.enabled = false;
+        col = GetComponent<Collider>();
+        col.enabled = false;
+
+        //Calculate rotation
     }
 
-    public class TeleportToNewHidingObject : UnityEvent<HidingObject>
+    public void Toggle()
     {
+        sr.enabled = !sr.enabled;
+        col.enabled = !col.enabled;
     }
-    TeleportToNewHidingObject TeleportEvent;
-    public void SubscribeToArrows(PlayerController playerController)
-    {
-        if (TeleportEvent == null)
-        {
-            TeleportEvent = new TeleportToNewHidingObject();
-        }
-
-        //TeleportEvent.AddListener(playerController.TeleportToNextHidingObject);
-    }
-    public void UnsubscribeToArrows()
-    {
-        TeleportEvent.RemoveAllListeners();
-    }
-
 }

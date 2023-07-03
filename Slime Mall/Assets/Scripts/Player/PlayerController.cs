@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Interactions")]
     [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask interactLayer;
+    [SerializeField][Tooltip("Layer where arrows are located")] LayerMask arrowLayer;
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
     bool bIsHidden = false;
 
@@ -55,10 +56,10 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
-        input.Touch.MoveClick.performed += DoMoveOnClick;
+        input.Touch.MoveClick.performed += DoActionOnClick;
         input.Touch.MoveClick.Enable();
 
-        input.Touch.MoveTouch.performed += DoMoveOnTouch;
+        input.Touch.MoveTouch.performed += DoActionOnTouch;
         input.Touch.MoveTouch.Enable();
     }
 
@@ -67,10 +68,10 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed -= DoPause;
         input.Movement.Pause.Disable();
 
-        input.Touch.MoveTouch.performed -= DoMoveOnTouch;
+        input.Touch.MoveTouch.performed -= DoActionOnTouch;
         input.Touch.MoveTouch.Disable();
 
-        input.Touch.MoveClick.performed -= DoMoveOnClick;
+        input.Touch.MoveClick.performed -= DoActionOnClick;
         input.Touch.MoveClick.Disable();
     }
 
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            else if(targetHS)
+            else if(targetHS && !bIsHidden)
             {
                 //In range
                 if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
@@ -116,28 +117,40 @@ public class PlayerController : MonoBehaviour
     //proceed with the closest object
     //if no object, then move
 
-    void DoMoveOnClick(InputAction.CallbackContext obj)
+    void DoActionOnClick(InputAction.CallbackContext obj)
     {
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Move(ray);
+        Action(ray);
     }
 
-    void DoMoveOnTouch(InputAction.CallbackContext obj)
+    void DoActionOnTouch(InputAction.CallbackContext obj)
     {
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
-        Move(ray);
+        Action(ray);
     }
 
-    void Move(Ray r)
+    void Action(Ray r)
     {
         //Check it hit something
         if (Physics.Raycast(r, out RaycastHit hit))
         {
-            //If we are hiding, leave
+            //If we are hiding, check for arrows
             if (bIsHidden)
             {
+                //Check for arrows
+                Collider[] arrow = Physics.OverlapSphere(hit.transform.position, 1, arrowLayer);
+                foreach (Collider col in arrow)
+                {
+                    //Arrow
+                    if (col.TryGetComponent<TeleportArrow>(out TeleportArrow ta))
+                    {
+                        //Use Arrow (teleport to next HS)
+                        return;
+                    }
+                }
+
                 ExitHidingObject();
             }
 
@@ -210,56 +223,36 @@ public class PlayerController : MonoBehaviour
 
     void EnterHidingObject()
     {
-        if (!animator.GetBool(targetHS.GetAnimationBool()))
+        agent.isStopped = true;
+
+        agent.enabled = false;
+        transform.position = targetHS.transform.position;
+
+        switch (targetHS.GetTypeID())
         {
-            //Animation
-            animator.SetTrigger(targetHS.GetAnimationTrigger());
-            animator.SetBool(targetHS.GetAnimationBool(), true);
-
-            //Disable Sprite renderer for HidingObject and Enter it
-            targetHS.GetComponent<SpriteRenderer>().enabled = false;
-            //targetHS.EnteredObject(this);
-
-            //Stop movement
-            agent.isStopped = true;
-
-            //Reposition
-            agent.enabled = false;
-            transform.position = targetHS.transform.position + (dir.normalized) / 4;
-            agent.enabled = true;
-            bIsHidden = true;
+            //Enter Vent
+            case 0: animator.SetTrigger("EnterVent");
+                break;
+            //Enter Bin
+            case 1: animator.SetTrigger("EnterBin");
+                break;
+            default: animator.SetTrigger("EnterVent");
+                break;
         }
+
+        targetHS.ArrowToggle();
+
+        bIsHidden = true;
+        //targetHS = null;
+        agent.enabled = true;
     }
+
     void ExitHidingObject()
     {
-        if (animator.GetBool(targetHS.GetAnimationBool()))
-        {
-            animator.SetBool(targetHS.GetAnimationBool(), false);
-            targetHS.GetComponent<SpriteRenderer>().enabled = true;
-            //targetHS.ExitedObject();           
-        }
-    }
-    public void E_ExitedHidingObject()
-    {
+        animator.SetTrigger("StopHiding");
+        targetHS.ArrowToggle();
         targetHS = null;
         bIsHidden = false;
-        agent.enabled = true;
-        //Enable movement
-        UnFreezePlayer();
-    }
-
-    public void TeleportToNextHidingObject(HidingObject NewHidingObject)
-    {
-        //Cleanup old HidingObject
-        targetHS.ExitedObject();
-        targetHS.GetComponent<SpriteRenderer>().enabled = true;
-
-        //Start new HidingObject
-        this.transform.position = NewHidingObject.transform.position;
-        NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
-        NewHidingObject.EnteredObject(this);
-        targetHS = NewHidingObject;
-
     }
 
     public void E_InteractSound()
