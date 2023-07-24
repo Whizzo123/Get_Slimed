@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
     bool bIsHidden = false;
 
+    Vector3 hitPos;
+
     void Awake()
     {
         if (instance == null) instance = this;
@@ -136,11 +138,12 @@ public class PlayerController : MonoBehaviour
         //Check it hit something
         if (Physics.Raycast(r, out RaycastHit hit))
         {
+            hitPos = hit.point;
             //If we are hiding, check for arrows
             if (bIsHidden)
             {
                 //Check for arrows
-                Collider[] arrow = Physics.OverlapSphere(hit.transform.position, 1, arrowLayer);
+                Collider[] arrow = Physics.OverlapSphere(hit.point, 1, arrowLayer);
                 foreach (Collider col in arrow)
                 {
                     //Arrow
@@ -151,11 +154,11 @@ public class PlayerController : MonoBehaviour
                     }
                 }
 
-                ExitHidingObject();
+                StartCoroutine(ExitHidingObject());
             }
 
             //Check for npcs and hidding spots
-            Collider[] interactibles = Physics.OverlapSphere(hit.transform.position, 1, interactLayer);
+            Collider[] interactibles = Physics.OverlapSphere(hit.point, 1, interactLayer);
             foreach (Collider col in interactibles)
             {
                 //Hiding spot
@@ -247,12 +250,21 @@ public class PlayerController : MonoBehaviour
         agent.enabled = true;
     }
 
-    void ExitHidingObject()
+    IEnumerator ExitHidingObject()
     {
+        agent.speed = 0;
         animator.SetTrigger("StopHiding");
         targetHS.ArrowToggle();
         targetHS = null;
+
+        yield return new WaitWhile(() => animator.GetCurrentAnimatorStateInfo(0).IsTag("Leave"));
+
+        agent.enabled = false;
+        transform.position += dir.x >= 0 ? new Vector3(1.25f, 0, 0.3f) : new Vector3(-1.25f, 0, 0.3f);
+        agent.enabled = true;
+
         bIsHidden = false;
+        agent.speed = 3.5f;
     }
 
     public void E_InteractSound()
@@ -271,5 +283,14 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactRadius);
+
+        if (agent)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(agent.destination, 1);
+        }
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(hitPos, 1);
     }
 }
