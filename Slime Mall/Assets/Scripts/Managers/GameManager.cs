@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
     [Range(0, 360)][SerializeField][Tooltip("Length of initial game session")] float SessionLength = 120;
     [Tooltip("Score of current session")]  int Score = 0;
     [Tooltip("")] int HighScore = 0;
-    [Tooltip("How many points you gain per kill")] int KillScoreValue = 10;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different score
     [Tooltip("How much time you gain per kill")] int KillTimeValue = 1;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different time gain
 
     bool bIsGameFinished = false;
@@ -67,12 +66,6 @@ public class GameManager : MonoBehaviour
             }
             UI.instance.UpdatedTimer(Mathf.FloorToInt(SessionLength / 60), Mathf.FloorToInt(SessionLength % 60));
         }
-    }
-
-    public void UpdateScore()
-    {
-        Score += KillScoreValue;
-        UI.instance.UpdateScore(Score);
     }
 
     public void PauseGame()

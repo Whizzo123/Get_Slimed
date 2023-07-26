@@ -36,8 +36,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField][Tooltip("Layer where arrows are located")] LayerMask arrowLayer;
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
     bool bIsHidden = false;
+    bool bIsTeleporting = false;
 
     Vector3 hitPos;
+
+    public static event Action OnAddScore;
 
     void Awake()
     {
@@ -94,14 +97,16 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            else if(targetHS && !bIsHidden)
+            //Not hidden and has HS
+            else if((targetHS && !bIsHidden) || bIsTeleporting)
             {
                 //In range
-                if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
+                if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius/2)
                 {
                     EnterHidingObject();
                 }
             }
+
 
             //Flip sprite based on direction
             if (dir.x < 0)
@@ -114,10 +119,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-    //On tap/click create sphere to check for npcs/hidding spot
-    //proceed with the closest object
-    //if no object, then move
 
     void DoActionOnClick(InputAction.CallbackContext obj)
     {
@@ -135,6 +136,9 @@ public class PlayerController : MonoBehaviour
 
     void Action(Ray r)
     {
+        //Cannot exit teleportation
+        if (bIsTeleporting) return;
+
         //Check it hit something
         if (Physics.Raycast(r, out RaycastHit hit))
         {
@@ -143,13 +147,22 @@ public class PlayerController : MonoBehaviour
             if (bIsHidden)
             {
                 //Check for arrows
-                Collider[] arrow = Physics.OverlapSphere(hit.point, 1, arrowLayer);
+                Collider[] arrow = Physics.OverlapSphere(hit.point, 0.75f, arrowLayer);
                 foreach (Collider col in arrow)
                 {
                     //Arrow
                     if (col.TryGetComponent<TeleportArrow>(out TeleportArrow ta))
                     {
+                        Debug.Log("Hit Arrow");
                         //Use Arrow (teleport to next HS)
+                        targetHS.ArrowToggle();
+                        animator.SetTrigger("StopHiding");
+                        //Add teleporting anim (idea: very short but long slime, like a trail)
+                        bIsTeleporting = true;
+                        targetNPC = null;
+                        targetHS = ta.GetHidingSpot();
+                        agent.speed = moveSpeed * 2;
+                        agent.SetDestination(targetHS.transform.position);
                         return;
                     }
                 }
@@ -219,7 +232,8 @@ public class PlayerController : MonoBehaviour
         agent.enabled = true;
 
         NPCManager.Instance.KillNPC(targetNPC);
-        GameManager.Instance.UpdateScore();
+        //Trying out new Design Pattern: Observer
+        OnAddScore?.Invoke();
 
         targetNPC = null;
     }
@@ -246,8 +260,10 @@ public class PlayerController : MonoBehaviour
         targetHS.ArrowToggle();
 
         bIsHidden = true;
+        bIsTeleporting = false;
         //targetHS = null;
         agent.enabled = true;
+        agent.speed = moveSpeed;
     }
 
     IEnumerator ExitHidingObject()
@@ -264,7 +280,7 @@ public class PlayerController : MonoBehaviour
         agent.enabled = true;
 
         bIsHidden = false;
-        agent.speed = 3.5f;
+        agent.speed = moveSpeed;
     }
 
     public void E_InteractSound()

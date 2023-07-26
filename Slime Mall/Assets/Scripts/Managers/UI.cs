@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,10 +19,6 @@ public class UI : MonoBehaviour
     public GameObject capturedScreen;
     public GameObject timeOutScreen;
 
-    public Image sprintBar;
-    public float sprintAmount = 3.0f;
-
-
     public GameObject loadingScreen;
     public Slider slider;
     public TextMeshProUGUI progressText;
@@ -29,11 +26,18 @@ public class UI : MonoBehaviour
     public TextMeshProUGUI timer;
     public TextMeshProUGUI score;
 
+    [Tooltip("How many points you gain per kill")] int KillScoreValue = 10;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different score
+
+
     void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(this);
+
+        PlayerController.OnAddScore += UpdateScore;
     }
+
+    private void OnDestroy() => PlayerController.OnAddScore -= UpdateScore;
 
     public void PauseActive(bool b)
     {
@@ -58,9 +62,10 @@ public class UI : MonoBehaviour
         timer.SetText(string.Format("{0:00}:{1:00}", minutes, seconds));
     }
 
-    public void UpdateScore(int sc)
+    public void UpdateScore()
     {
-        score.SetText(sc.ToString());
+        int scoreToAdd = int.Parse(score.text) + KillScoreValue;
+        score.SetText(scoreToAdd.ToString());
     }
 
     public void PlayButton(int index)
@@ -107,11 +112,5 @@ public class UI : MonoBehaviour
         timeOutScreen.SetActive(true);
         timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
         timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
-    }
-
-    public void ChangeSprintBar(float amount)
-    {
-        sprintAmount = amount;
-        sprintBar.fillAmount = sprintAmount / 3.0f;
     }
 }

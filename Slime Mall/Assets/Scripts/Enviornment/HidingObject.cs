@@ -12,14 +12,33 @@ public class HidingObject : MonoBehaviour
     [SerializeField, Tooltip("0=Vent, 1=Bin")]
     int typeID = 0;
 
-    public List<TeleportArrow> arrowList;
+    [Tooltip("Arrow Prefab")]
+    public GameObject arrowObject;
+
+    [Tooltip("Other spots to hide")]
+    public List<HidingObject> accesibleSpots;
+    List<GameObject> arrowList = new List<GameObject>();
+
+    void Start()
+    {
+        if(accesibleSpots != null) 
+        {
+            //Spawn arrows
+            foreach (HidingObject arrow in accesibleSpots)
+            {
+                GameObject newArrow = Instantiate(arrowObject, transform.position, Quaternion.identity, transform);
+                newArrow.GetComponent<TeleportArrow>().SetHidingSpot(arrow);
+                arrowList.Add(newArrow);
+            }
+        }
+    }
 
     public void ArrowToggle()
     {
         //for each turn off sprite and collision
-        foreach (TeleportArrow ta in arrowList)
+        foreach (GameObject arrow in arrowList)
         {
-            ta.Toggle();
+            arrow.SetActive(!arrow.activeSelf);
         }
     }
 

@@ -14,23 +14,27 @@ using UnityEngine.UI;
 
 public class TeleportArrow : MonoBehaviour
 {
-    [SerializeField][Tooltip("Object that the arrow is pointing to")] HidingObject HS;
-    SpriteRenderer sr;
-    Collider col;
+    HidingObject HS;
 
-    void Start()
+    public void SetHidingSpot(HidingObject hs)
     {
-        sr = GetComponent<SpriteRenderer>();
-        sr.enabled = false;
-        col = GetComponent<Collider>();
-        col.enabled = false;
+        HS = hs;
+        Vector3 target = hs.transform.position;
+        target.y = 0f;
 
-        //Calculate rotation
+        target.x = target.x - transform.position.x;
+        target.z = target.z - transform.position.z;
+
+        float angle = Mathf.Atan2(target.z, target.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(new Vector3(90, 0, angle));
+
+        Vector3 dir = (hs.transform.position - transform.position).normalized;
+        dir.y = 1;
+        transform.position += dir;
     }
 
-    public void Toggle()
+    public HidingObject GetHidingSpot()
     {
-        sr.enabled = !sr.enabled;
-        col.enabled = !col.enabled;
+        return HS;
     }
 }

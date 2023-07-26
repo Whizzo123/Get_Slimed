@@ -77,7 +77,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 9c7fe961a3abc0942ae573cbad050cb7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -130,8 +130,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92c96f965aa17b34fb79bed7eedf9441, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TeleportingArrows: []
-  ObjectAnimationIdentifier: Bin
+  typeID: 0
+  arrowObject: {fileID: 1766271472307460578, guid: def98892afafefa439831cc6c6456fd9, type: 3}
+  accesibleSpots: []
 --- !u!65 &3342665898056440404
 BoxCollider:
   m_ObjectHideFlags: 0
