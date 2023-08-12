@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.AI;
 using static NPCManager;
+using UnityEditor.UI;
 
 /*
 *AUTHOR: Antonio Villalta Isidro
@@ -213,6 +214,7 @@ public class PlayerController : MonoBehaviour
     {
         agent.isStopped = true;
         agent.enabled = false;
+        gameObject.SetActive(false);
     }
 
     private void UnFreezePlayer()

@@ -10,14 +10,15 @@ public class UIAnim_HighScoreScreen : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text Score;
     [SerializeField] private TMPro.TMP_Text HighScore;
+    [SerializeField] private TMPro.TMP_Text EndMessage;
     [SerializeField] private GameObject[] BounceObjects;
 
     [SerializeField] private float ScaleTime;
-    public void SetData(int ScoreNumber, int HighScoreNumber)
+    public void SetData(int ScoreNumber, int HighScoreNumber, string Message)
     {
-        
         Score.text = ScoreNumber.ToString();
         HighScore.text = HighScoreNumber.ToString();
+        EndMessage.text = Message;
     }
     public void StartAnimations()
     {
