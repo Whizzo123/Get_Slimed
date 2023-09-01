@@ -387,8 +387,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92c96f965aa17b34fb79bed7eedf9441, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TeleportingArrows: []
-  ObjectAnimationIdentifier: Vent
+  typeID: 0
+  arrowObject: {fileID: 1766271472307460578, guid: def98892afafefa439831cc6c6456fd9, type: 3}
+  accesibleSpots: []
 --- !u!65 &8377265957301631911
 BoxCollider:
   m_ObjectHideFlags: 0

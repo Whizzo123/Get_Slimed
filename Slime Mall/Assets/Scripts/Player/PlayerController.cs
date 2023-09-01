@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.AI;
 using static NPCManager;
+using UnityEditor.UI;
 
 /*
 *AUTHOR: Antonio Villalta Isidro
@@ -30,14 +31,17 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField, Range(1f, 100f), Tooltip("Movement speed")]
     float moveSpeed = 5f;
-    bool bIsMovementEnabled = true;
 
-    [Header("Inteactions")]
+    [Header("Interactions")]
     [SerializeField][Tooltip("Layer that the player can interact with")] LayerMask interactLayer;
+    [SerializeField][Tooltip("Layer where arrows are located")] LayerMask arrowLayer;
     [SerializeField][Range(0, 5f)][Tooltip("Radius that player can trigger interact objects")] float interactRadius = 1f;
-    CircleCollider2D interactCircle;
-    HidingObject objectHidingIn;
-    bool bIsInteractEnabled = true;
+    bool bIsHidden = false;
+    bool bIsTeleporting = false;
+
+    Vector3 hitPos;
+
+    public static event Action OnAddScore;
 
     void Awake()
     {
@@ -49,45 +53,31 @@ public class PlayerController : MonoBehaviour
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        interactCircle = GetComponentInChildren<CircleCollider2D>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
 
         //Variables
-        interactCircle.radius = interactRadius;
 
-        //Bind movement to an action
-        input.Movement.Interact.performed += DoInteract;
-        input.Movement.Interact.Enable();
-
-        input.Movement.Kill.performed += DoKill;
-        input.Movement.Kill.Enable();
-
+        //Bind input to action
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
-        input.Touch.MoveClick.performed += DoMoveOnClick;
+        input.Touch.MoveClick.performed += DoActionOnClick;
         input.Touch.MoveClick.Enable();
 
-        input.Touch.MoveTouch.performed += DoMoveOnTouch;
+        input.Touch.MoveTouch.performed += DoActionOnTouch;
         input.Touch.MoveTouch.Enable();
     }
 
     public void Cleanup()
     {
-        input.Movement.Interact.performed -= DoInteract;
-        input.Movement.Interact.Disable();
-
-        input.Movement.Kill.performed -= DoKill;
-        input.Movement.Kill.Disable();
-
         input.Movement.Pause.performed -= DoPause;
         input.Movement.Pause.Disable();
 
-        input.Touch.MoveTouch.performed -= DoMoveOnTouch;
+        input.Touch.MoveTouch.performed -= DoActionOnTouch;
         input.Touch.MoveTouch.Disable();
 
-        input.Touch.MoveClick.performed -= DoMoveOnClick;
+        input.Touch.MoveClick.performed -= DoActionOnClick;
         input.Touch.MoveClick.Disable();
     }
 
@@ -104,27 +94,20 @@ public class PlayerController : MonoBehaviour
                 //In range
                 if(Vector3.Distance(transform.position, targetNPC.transform.position) <= interactRadius)
                 {
-                    animator.SetTrigger("Consume");
-                    agent.enabled = false;
-                    //anim?
-                    transform.position = targetNPC.transform.position;
-                    NPCManager.Instance.KillNPC(targetNPC);
-                    GameManager.Instance.UpdateScore();
-                    agent.enabled = true;
-                    targetNPC = null;
+                    KillNPC();
                 }
             }
 
-            else if(targetHS)
+            //Not hidden and has HS
+            else if((targetHS && !bIsHidden) || bIsTeleporting)
             {
                 //In range
-                if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius)
+                if (Vector3.Distance(transform.position, targetHS.transform.position) <= interactRadius/2)
                 {
-                    agent.enabled = false;
-                    EnterHidingObject(targetHS);
-                    targetHS = null;
+                    EnterHidingObject();
                 }
             }
+
 
             //Flip sprite based on direction
             if (dir.x < 0)
@@ -138,53 +121,65 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //On tap/click create sphere to check for npcs/hidding spot
-    //proceed with the closest object
-    //if no object, then move
-
-    void DoMoveOnClick(InputAction.CallbackContext obj)
+    void DoActionOnClick(InputAction.CallbackContext obj)
     {
-        //If we can interact
-        if (bIsInteractEnabled)
-        {
-            //Create ray
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            Move(ray);           
-        }
+        //Create ray
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Action(ray);
     }
 
-    void DoMoveOnTouch(InputAction.CallbackContext obj)
+    void DoActionOnTouch(InputAction.CallbackContext obj)
     {
-        //If we can interact
-        if (bIsInteractEnabled)
-        {
-            //Create ray
-            Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
-            Move(ray);
-        }
+        //Create ray
+        Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
+        Action(ray);
     }
 
-    void Move(Ray r)
+    void Action(Ray r)
     {
+        //Cannot exit teleportation
+        if (bIsTeleporting) return;
+
         //Check it hit something
         if (Physics.Raycast(r, out RaycastHit hit))
         {
-            //If we are hiding, leave
-            if (objectHidingIn)
+            hitPos = hit.point;
+            //If we are hiding, check for arrows
+            if (bIsHidden)
             {
-                ExitHidingObject(objectHidingIn);
-                agent.enabled = true;
+                //Check for arrows
+                Collider[] arrow = Physics.OverlapSphere(hit.point, 0.75f, arrowLayer);
+                foreach (Collider col in arrow)
+                {
+                    //Arrow
+                    if (col.TryGetComponent<TeleportArrow>(out TeleportArrow ta))
+                    {
+                        Debug.Log("Hit Arrow");
+                        //Use Arrow (teleport to next HS)
+                        targetHS.ArrowToggle();
+                        animator.SetTrigger("StopHiding");
+                        //Add teleporting anim (idea: very short but long slime, like a trail)
+                        bIsTeleporting = true;
+                        targetNPC = null;
+                        targetHS = ta.GetHidingSpot();
+                        agent.speed = moveSpeed * 2;
+                        agent.SetDestination(targetHS.transform.position);
+                        return;
+                    }
+                }
+
+                StartCoroutine(ExitHidingObject());
             }
 
             //Check for npcs and hidding spots
-            Collider[] interactibles = Physics.OverlapSphere(hit.transform.position, interactRadius / 2, interactLayer);
+            Collider[] interactibles = Physics.OverlapSphere(hit.point, 1, interactLayer);
             foreach (Collider col in interactibles)
             {
                 //Hiding spot
                 if (col.TryGetComponent<HidingObject>(out HidingObject hs))
                 {
-                    targetHS = hs;
                     targetNPC = null;
+                    targetHS = hs;
                     agent.SetDestination(targetHS.transform.position);
                     return;
                 }
@@ -205,58 +200,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void DoInteract(InputAction.CallbackContext obj)
-    {
-        // Interact is disabled while in the middle of interacting want to prevent spamming 'E'
-        if (bIsInteractEnabled)
-        {
-            //If we are already hiding in an object we will exit
-            if (objectHidingIn)
-            {
-                ExitHidingObject(objectHidingIn);
-                return;
-            }
-            else
-            {
-                // Are we within the radius of interacting with the HidingObject?
-                Collider2D[] Collisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
-                foreach (Collider2D ValidCollision in Collisions)
-                {
-                    HidingObject NewHidingObject = null;
-                    if (ValidCollision.TryGetComponent<HidingObject>(out NewHidingObject))
-                    {
-                        EnterHidingObject(NewHidingObject);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    void DoKill(InputAction.CallbackContext obj)
-    {
-        // If the slime is hiding don't let them kill an NPC
-        if (IsSlimeHidden() == true)
-        {
-            return;
-        }
-        // TODO this has an issue with PlayerController still being referenced after destruction
-        Collider2D[] InteractableCollisions = Physics2D.OverlapCircleAll(transform.position, interactRadius, interactLayer);
-
-        foreach (Collider2D Colliders in InteractableCollisions)
-        {
-            NPCBehaviour NPC;
-            if (Colliders.TryGetComponent(out NPC))
-            {
-                animator.SetTrigger("Consume");
-                transform.position = NPC.gameObject.transform.position;
-                NPCManager.Instance.KillNPC(NPC);
-                GameManager.Instance.UpdateScore();
-                return;
-            }
-        }
-    }
-
     void DoPause(InputAction.CallbackContext obj)
     {
         GameManager.Instance.PauseGame();
@@ -264,75 +207,82 @@ public class PlayerController : MonoBehaviour
 
     public bool IsSlimeHidden()
     {
-        return (objectHidingIn);
+        return (bIsHidden);
     }
 
     public void FreezePlayer()
     {
-        bIsMovementEnabled = false;
         agent.isStopped = true;
         agent.enabled = false;
+        gameObject.SetActive(false);
     }
 
     private void UnFreezePlayer()
     {
-        bIsMovementEnabled = true;
         agent.isStopped = false;
         agent.enabled = true;
     }
 
     #region INTERACTING
 
-    void EnterHidingObject(HidingObject NewHidingObject)
+    void KillNPC()
     {
-        if (!animator.GetBool(NewHidingObject.GetAnimationBool()))
+        animator.SetTrigger("Consume");
+
+        agent.enabled = false;
+        transform.position = targetNPC.transform.position;
+        agent.enabled = true;
+
+        NPCManager.Instance.KillNPC(targetNPC);
+        //Trying out new Design Pattern: Observer
+        OnAddScore?.Invoke();
+
+        targetNPC = null;
+    }
+
+    void EnterHidingObject()
+    {
+        agent.isStopped = true;
+
+        agent.enabled = false;
+        transform.position = targetHS.transform.position;
+
+        switch (targetHS.GetTypeID())
         {
-            //Animation
-            animator.SetTrigger(NewHidingObject.GetAnimationTrigger());
-            animator.SetBool(NewHidingObject.GetAnimationBool(), true);
-            //Disable Sprite renderer for HidingObject and Enter it
-            NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
-            NewHidingObject.EnteredObject(this);
-            objectHidingIn = NewHidingObject;
-            //Disable movement
-            bIsInteractEnabled = false;
-            //FreezePlayer();
-            //Reposition
-            Vector3 DirectionFacingBin = NewHidingObject.transform.position - transform.position;
-            transform.position = NewHidingObject.transform.position + (DirectionFacingBin.normalized) / 4;
-            bIsInteractEnabled = true;
-        }
-    }
-    void ExitHidingObject(HidingObject CurrentHidingObject)
-    {
-        if (animator.GetBool(CurrentHidingObject.GetAnimationBool()))
-        {
-            bIsInteractEnabled = false;
-            animator.SetBool(CurrentHidingObject.GetAnimationBool(), false);
-            CurrentHidingObject.ExitedObject();
+            //Enter Vent
+            case 0: animator.SetTrigger("EnterVent");
+                break;
+            //Enter Bin
+            case 1: animator.SetTrigger("EnterBin");
+                break;
+            default: animator.SetTrigger("EnterVent");
+                break;
         }
 
-    }
-    public void E_ExitedHidingObject()
-    {
-        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
-        objectHidingIn = null;
-        //Enable movement
-        UnFreezePlayer();
-        bIsInteractEnabled = true;
-    }
-    public void TeleportToNextHidingObject(HidingObject NewHidingObject)
-    {
-        //Cleanup old HidingObject
-        objectHidingIn.ExitedObject();
-        objectHidingIn.GetComponent<SpriteRenderer>().enabled = true;
+        targetHS.ArrowToggle();
 
-        //Start new HidingObject
-        this.transform.position = NewHidingObject.transform.position;
-        NewHidingObject.GetComponent<SpriteRenderer>().enabled = false;
-        NewHidingObject.EnteredObject(this);
-        objectHidingIn = NewHidingObject;
+        bIsHidden = true;
+        bIsTeleporting = false;
+        //targetHS = null;
+        agent.enabled = true;
+        agent.speed = moveSpeed;
+    }
 
+    IEnumerator ExitHidingObject()
+    {
+        agent.speed = 0;
+        animator.SetTrigger("StopHiding");
+        targetHS.ArrowToggle();
+        targetHS = null;
+
+        yield return new WaitWhile(() => animator.GetCurrentAnimatorStateInfo(0).IsTag("Leave"));
+
+        agent.enabled = false;
+        transform.position += dir.x >= 0 ? new Vector3(1.25f, 0, 0.3f) : new Vector3(-1.25f, 0, 0.3f);
+        agent.enabled = true;
+
+        bIsHidden = false;
+        agent.speed = moveSpeed;
     }
 
     public void E_InteractSound()
@@ -340,16 +290,25 @@ public class PlayerController : MonoBehaviour
         AudioManager.instance.PlaySoundFromSource("Interact", audioSource);
     }
 
-    #endregion
-
     public void E_ConsumeSound()
     {
         AudioManager.instance.PlaySoundFromSource("Consume", audioSource);
     }
 
+    #endregion
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactRadius);
+
+        if (agent)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(agent.destination, 1);
+        }
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(hitPos, 1);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,12 +16,7 @@ public class UI : MonoBehaviour
     public GameObject creditsScreen;
 
     public GameObject guiScreen;
-    public GameObject capturedScreen;
-    public GameObject timeOutScreen;
-
-    public Image sprintBar;
-    public float sprintAmount = 3.0f;
-
+    public GameObject endScreen;
 
     public GameObject loadingScreen;
     public Slider slider;
@@ -29,11 +25,21 @@ public class UI : MonoBehaviour
     public TextMeshProUGUI timer;
     public TextMeshProUGUI score;
 
+    public string capturedMessage;
+    public string endTimeMessage;
+
+    [Tooltip("How many points you gain per kill")] int KillScoreValue = 10;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different score
+
+
     void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(this);
+
+        PlayerController.OnAddScore += UpdateScore;
     }
+
+    private void OnDestroy() => PlayerController.OnAddScore -= UpdateScore;
 
     public void PauseActive(bool b)
     {
@@ -58,15 +64,17 @@ public class UI : MonoBehaviour
         timer.SetText(string.Format("{0:00}:{1:00}", minutes, seconds));
     }
 
-    public void UpdateScore(int sc)
+    public void UpdateScore()
     {
-        score.SetText(sc.ToString());
+        int scoreToAdd = int.Parse(score.text) + KillScoreValue;
+        score.SetText(scoreToAdd.ToString());
     }
 
     public void PlayButton(int index)
     {
         mainMenuScreen.SetActive(false);
         GameManager.Instance.LoadLevel(index);
+        if(PlayerController.instance != null) PlayerController.instance.Cleanup();
     }
 
     public void SettingsButton()
@@ -96,22 +104,16 @@ public class UI : MonoBehaviour
     public void CapturedEnd(int score, int hiscore)
     {
         guiScreen.SetActive(false);
-        capturedScreen.SetActive(true);
-        capturedScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
-        capturedScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
+        endScreen.SetActive(true);
+        endScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore, capturedMessage);
+        endScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
 
     }
     public void TimeOutEnd(int score, int hiscore)
     {
         guiScreen.SetActive(false);
-        timeOutScreen.SetActive(true);
-        timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore);
-        timeOutScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
-    }
-
-    public void ChangeSprintBar(float amount)
-    {
-        sprintAmount = amount;
-        sprintBar.fillAmount = sprintAmount / 3.0f;
+        endScreen.SetActive(true);
+        endScreen.GetComponent<UIAnim_HighScoreScreen>().SetData(score, hiscore, endTimeMessage);
+        endScreen.GetComponent<UIAnim_HighScoreScreen>().StartAnimations();
     }
 }

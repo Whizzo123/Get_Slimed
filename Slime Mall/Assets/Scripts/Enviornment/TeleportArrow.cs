@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 /*
 *AUTHOR: Tanapat Somrid
-*EDITORS:
+*EDITORS: Antonio Villalta
 *DATEOFCREATION: 05/06/2023
 *DESCRIPTION: The Teleport arrow will contain the corresponding HidingObject that, once this arrow is pressed, the player will teleport to.
 *   It does this via callback functions with UnityEvents.
@@ -13,31 +14,27 @@ using UnityEngine.Events;
 
 public class TeleportArrow : MonoBehaviour
 {
-    [SerializeField][Tooltip("Object that the arrow is pointing to")] HidingObject NextHidingObject;
+    HidingObject HS;
 
-    //Should call when the sprite has been pressed
-    [ContextMenu("Has been pressed")]
-    public void InteractedWith()
+    public void SetHidingSpot(HidingObject hs)
     {
-        TeleportEvent.Invoke(NextHidingObject);
+        HS = hs;
+        Vector3 target = hs.transform.position;
+        target.y = 0f;
+
+        target.x = target.x - transform.position.x;
+        target.z = target.z - transform.position.z;
+
+        float angle = Mathf.Atan2(target.z, target.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(new Vector3(90, 0, angle));
+
+        Vector3 dir = (hs.transform.position - transform.position).normalized;
+        dir.y = 1;
+        transform.position += dir;
     }
 
-    public class TeleportToNewHidingObject : UnityEvent<HidingObject>
+    public HidingObject GetHidingSpot()
     {
+        return HS;
     }
-    TeleportToNewHidingObject TeleportEvent;
-    public void SubscribeToArrows(PlayerController playerController)
-    {
-        if (TeleportEvent == null)
-        {
-            TeleportEvent = new TeleportToNewHidingObject();
-        }
-
-        //TeleportEvent.AddListener(playerController.TeleportToNextHidingObject);
-    }
-    public void UnsubscribeToArrows()
-    {
-        TeleportEvent.RemoveAllListeners();
-    }
-
 }
