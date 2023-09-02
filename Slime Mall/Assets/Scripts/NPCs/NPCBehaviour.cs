@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 /*
 *AUTHOR: Antonio Villalta Isidro
 *EDITORS: Tanapat Somrid
@@ -40,8 +41,6 @@ public class NPCBehaviour : MonoBehaviour
     protected float IdleTime;
     protected float WanderTime;
     protected float LastStep;
-
-    protected GameObject SpottedSlime;
 
     void Awake()
     {
@@ -153,7 +152,7 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
+            //GetComponent<ActivatePrompt>().ShowEmotion();
             AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
             ChangeState(StateMachine.ESCAPE);
         }
@@ -169,7 +168,7 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
+            //GetComponent<ActivatePrompt>().ShowEmotion();
             AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
             ChangeState(StateMachine.ESCAPE);
         }
@@ -185,14 +184,14 @@ public class NPCBehaviour : MonoBehaviour
         //Runaway from the slime at high speeds or stop running away after a certain distance
         const float RunawayThresholdDistance = 7.5f;
         SpeedMultiplier = RunSpeed;
-        if (Vector3.Distance(SpottedSlime.transform.position, this.transform.position) >= RunawayThresholdDistance)
+        if (Vector3.Distance(PlayerController.instance.transform.position, this.transform.position) >= RunawayThresholdDistance)
         {
-            GetComponent<ActivatePrompt>().HideEmotion();
+            // GetComponent<ActivatePrompt>().HideEmotion();
             ChangeState(StateMachine.IDLE);
         }
         else
         {
-            agent.SetDestination((transform.position - SpottedSlime.transform.position).normalized);
+            agent.SetDestination((transform.position - PlayerController.instance.transform.position).normalized);
         }
     }
 
@@ -202,11 +201,11 @@ public class NPCBehaviour : MonoBehaviour
         if (CheckForSlime() == true)
         {
             SpeedMultiplier = RunSpeed;
-            agent.SetDestination((SpottedSlime.transform.position - transform.position).normalized);
+            agent.SetDestination((PlayerController.instance.transform.position - transform.position).normalized);
         }
         else
         {
-            GetComponent<ActivatePrompt>().HideEmotion();
+            //GetComponent<ActivatePrompt>().HideEmotion();
             ChangeState(StateMachine.IDLE);
             agent.destination = transform.position;
         }
@@ -237,8 +236,7 @@ public class NPCBehaviour : MonoBehaviour
     /// </summary>
     protected bool CheckForSlime()
     {
-        SpottedSlime = EntitySight.PollForSeenObjectOfType<PlayerController>();
-        bool SlimeAvailableToSpot = (SpottedSlime != null) && (SpottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false);
+        bool SlimeAvailableToSpot = (EntitySight.IsSlimeInRange()) && (PlayerController.instance.IsSlimeHidden() == false);
         return SlimeAvailableToSpot;
     }
 

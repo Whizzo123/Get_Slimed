@@ -8,17 +8,11 @@ using UnityEngine;
 public class NPCSightComponent : MonoBehaviour
 {
     float sightRadius;
-    List<GameObject> seenGameObjects;
+    bool seenSlime = false;
 
-    public LayerMask seeableObjectsLayer;
     private float TimeToWaitToSee = 0.1f;
     private float CurrentWaitingTimeToSee = 0.0f;
     private Vector3 debugWireSpherePosition = Vector3.zero;
-
-    private void Start()
-    {
-        seenGameObjects = new List<GameObject>();
-    }
 
     public void UpdateSight(Vector3 dir)
     {
@@ -38,35 +32,23 @@ public class NPCSightComponent : MonoBehaviour
         sightRadius = newSightRadius;
     }
 
-    public GameObject PollForSeenObjectOfType<T>()
-    {
-        foreach(GameObject seenObject in seenGameObjects)
-        {
-            if (seenObject != null)
-            {
-                T component;
-                seenObject.TryGetComponent<T>(out component);
-                if (component != null)
-                {
-                    return seenObject;
-                }
-            }
-        }
-        return null;
-    }
-
     private void ScanSurroundings(Vector3 facingDirection)
     {
-        Debug.Log("Scanning");
-        seenGameObjects.Clear();
         debugWireSpherePosition = transform.position;
 
         // Any new objects add them to the list of seen things
         if(Vector3.Distance(transform.position, PlayerController.instance.GetPosition())<=sightRadius)
         {
             Debug.Log("Seen");
-            seenGameObjects.Add(PlayerController.instance.gameObject);
+            seenSlime = true;
+            return;
         }
+        seenSlime = false;
+    }
+
+    public bool IsSlimeInRange()
+    {
+        return seenSlime;
     }
 
     private void OnDrawGizmos()

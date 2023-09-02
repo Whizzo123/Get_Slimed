@@ -42,7 +42,7 @@ public class SecurityBehaviour : NPCBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
+            //GetComponent<ActivatePrompt>().ShowEmotion();
             AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
             ChangeState(StateMachine.CHASE);
         }
@@ -58,7 +58,7 @@ public class SecurityBehaviour : NPCBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
+            //GetComponent<ActivatePrompt>().ShowEmotion();
             AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
             ChangeState(StateMachine.CHASE);
         }
