@@ -46,7 +46,7 @@ public class NPCBehaviour : MonoBehaviour
     void Awake()
     {
         AudioSource = GetComponent<AudioSource>();
-        //EntitySpriteRenderer = GetComponent<SpriteRenderer>();
+        EntitySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
         EntityAnimator = GetComponent<Animator>();
         EntitySight = GetComponent<NPCSightComponent>();
 
@@ -215,6 +215,13 @@ public class NPCBehaviour : MonoBehaviour
     public Vector3 FindDirection()
     {
         Vector3 Target = NPCManager.Instance.FindPointForMyZone(this);
+        Vector3 Direction = (Target - transform.position).normalized;
+        return Direction;
+    }
+
+    public Vector3 FindGuardDirection()
+    {
+        Vector3 Target = NPCManager.Instance.FindPointForMap(this);
         Vector3 Direction = (Target - transform.position).normalized;
         return Direction;
     }

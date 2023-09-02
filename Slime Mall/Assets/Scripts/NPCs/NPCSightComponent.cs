@@ -20,7 +20,7 @@ public class NPCSightComponent : MonoBehaviour
         seenGameObjects = new List<GameObject>();
     }
 
-    public void UpdateSight(Vector2 dir)
+    public void UpdateSight(Vector3 dir)
     {
         if(CurrentWaitingTimeToSee >= TimeToWaitToSee)
         {
@@ -57,14 +57,15 @@ public class NPCSightComponent : MonoBehaviour
 
     private void ScanSurroundings(Vector3 facingDirection)
     {
+        Debug.Log("Scanning");
         seenGameObjects.Clear();
-        // Use Physics2D.overlap all
-        debugWireSpherePosition = transform.position + (facingDirection * (sightRadius - 0.5f));
-        Collider2D[] collisions = Physics2D.OverlapCircleAll(debugWireSpherePosition, sightRadius, seeableObjectsLayer);
+        debugWireSpherePosition = transform.position;
+
         // Any new objects add them to the list of seen things
-        foreach(Collider2D seenObject in collisions)
+        if(Vector3.Distance(transform.position, PlayerController.instance.GetPosition())<=sightRadius)
         {
-            seenGameObjects.Add(seenObject.gameObject);
+            Debug.Log("Seen");
+            seenGameObjects.Add(PlayerController.instance.gameObject);
         }
     }
 

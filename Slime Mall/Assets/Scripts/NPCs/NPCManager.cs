@@ -25,6 +25,9 @@ public class NPCManager : MonoBehaviour
     Dictionary<NPCBehaviour, int> NPCInZone = new Dictionary<NPCBehaviour, int>();
     public BoxCollider[] SpawnZones = new BoxCollider[3];
 
+    public NPCObject guardPrefab;
+    public int guardsPerZone = 1;
+
     void Awake()
     {
         if (Instance == null)
@@ -46,6 +49,13 @@ public class NPCManager : MonoBehaviour
         return new Vector3(movePointX, 0, movePointZ);
     }
 
+    public Vector3 FindPointForMap(NPCBehaviour npc) 
+    {
+        float movePointX = Random.Range(-10, 10);
+        float movePointZ = Random.Range(-10, 10);
+        return new Vector3(movePointX, 0, movePointZ);
+    }
+
     public void SpawnNPCs()
     {
         //Spawn based on NPCList types and how many of the types there are
@@ -62,6 +72,22 @@ public class NPCManager : MonoBehaviour
                 NewNPC.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].NPCType);
 
                 NPCInZone.Add(NewNPC.GetComponent<NPCBehaviour>(), RandomSpawn);
+            }
+        }
+
+        //Spawn guards in each zone
+        for (int i = 0; i < SpawnZones.Length; i++)
+        {
+            for (int j = 0; j < guardsPerZone; j++)
+            {
+                //Get random points in current zone
+                Vector3 SpawnPoint = GetRandomPointInZone(i);
+
+                //Spawn new guards
+                GameObject NewNPC = Instantiate(guardPrefab.NpcPrefab, SpawnPoint, Quaternion.identity, transform);
+                //NewNPC.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].NPCType);
+
+               //GuardList.Add(NewNPC.GetComponent<NPCBehaviour>(), i);
             }
         }
     }

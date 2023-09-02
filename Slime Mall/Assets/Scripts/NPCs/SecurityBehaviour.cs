@@ -48,7 +48,7 @@ public class SecurityBehaviour : NPCBehaviour
         }
         else if (Time.time >= LastStep + IdleTime)
         {
-            agent.SetDestination(FindDirection());
+            agent.SetDestination(FindGuardDirection());
             ChangeState(StateMachine.WANDER);
         }
     }

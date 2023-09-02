@@ -297,6 +297,8 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    public Vector3 GetPosition() { return transform.position; }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

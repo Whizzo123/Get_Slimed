@@ -21,5 +21,5 @@ MonoBehaviour:
   SpriteColour: {r: 1, g: 1, b: 1, a: 1}
   Animator: {fileID: 22100000, guid: 292ab8fc19cac604e88ee8598e9c790f, type: 2}
   SpotSoundIdentifier: Spot
-  NpcPrefab: {fileID: 7226305476576412004, guid: 7b869462e69b0744d80f453d6924da44, type: 3}
+  NpcPrefab: {fileID: 5545669895181738786, guid: 236b3c25b7ba444469df29b23338d3af, type: 3}
   Killed: 0
