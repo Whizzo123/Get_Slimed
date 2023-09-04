@@ -741,10 +741,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NPCList:
   - NPCType: {fileID: 11400000, guid: 11a618c7341e2b6489de752be210bdce, type: 2}
-    Amount: 1
+    Amount: 2
   SpawnZones:
   - {fileID: 922841244}
   - {fileID: 922841244}
+  guardPrefab: {fileID: 11400000, guid: 318acffe0f77b0b448d58e7013fd0062, type: 2}
+  guardsPerZone: 1
 --- !u!4 &352012052
 Transform:
   m_ObjectHideFlags: 0
@@ -1517,7 +1519,7 @@ GameObject:
   - component: {fileID: 899358295}
   - component: {fileID: 899358294}
   - component: {fileID: 899358296}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2042,12 +2044,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: 21300000, guid: 49daef19ad663184785507889c765a70, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5606d00caa1e84e932b40fc648b0cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 4.0625, y: 3.25}
+  m_Size: {x: 5, y: 5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2062,7 +2064,7 @@ Transform:
   m_GameObject: {fileID: 1122544176}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -2.3594646, y: 0.1, z: 2.6560638}
-  m_LocalScale: {x: 0.58986616, y: 0.7952284, z: 1}
+  m_LocalScale: {x: 0.36046132, y: 0.48595613, z: 0.61109}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 646225279}
@@ -2078,11 +2080,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.52, y: 1.36, z: 0.1}
+  m_Extents: {x: 2.33, y: 2.23, z: 0.1}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.25, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
 --- !u!1 &1175660637
 GameObject:
@@ -2411,12 +2413,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: 21300000, guid: 49daef19ad663184785507889c765a70, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5606d00caa1e84e932b40fc648b0cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 4.0625, y: 3.25}
+  m_Size: {x: 5, y: 5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2431,7 +2433,7 @@ Transform:
   m_GameObject: {fileID: 1434887720}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 2.3594646, y: 0.1, z: 2.6560638}
-  m_LocalScale: {x: 0.58986616, y: 0.7952284, z: 1}
+  m_LocalScale: {x: 0.36046132, y: 0.48595613, z: 0.61109}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 646225279}
@@ -2447,11 +2449,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.52, y: 1.36, z: 0.1}
+  m_Extents: {x: 2.33, y: 2.23, z: 0.1}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.25, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
 --- !u!1 &1645082541
 GameObject:
@@ -2598,7 +2600,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1653260453}
   - component: {fileID: 1653260455}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerArea
   m_TagString: PlayerArea
   m_Icon: {fileID: 0}
@@ -2747,12 +2749,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: 21300000, guid: 49daef19ad663184785507889c765a70, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5606d00caa1e84e932b40fc648b0cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 4.0625, y: 3.25}
+  m_Size: {x: 5, y: 5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2767,7 +2769,7 @@ Transform:
   m_GameObject: {fileID: 1787884167}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0.1, z: 2.6560638}
-  m_LocalScale: {x: 0.58986616, y: 0.7952284, z: 1}
+  m_LocalScale: {x: 0.36046132, y: 0.48595613, z: 0.61109}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 646225279}
@@ -2783,11 +2785,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.52, y: 1.36, z: 0.1}
+  m_Extents: {x: 2.33, y: 2.23, z: 0.1}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.25, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
 --- !u!1001 &1813063928
 PrefabInstance:

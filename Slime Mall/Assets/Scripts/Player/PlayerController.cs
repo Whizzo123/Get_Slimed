@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviour
 
     void DoActionOnClick(InputAction.CallbackContext obj)
     {
+        if (!agent.enabled) return;
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         Action(ray);
@@ -130,6 +131,7 @@ public class PlayerController : MonoBehaviour
 
     void DoActionOnTouch(InputAction.CallbackContext obj)
     {
+        if (!agent.enabled) return;
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
         Action(ray);
@@ -296,6 +298,8 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
+
+    public Vector3 GetPosition() { return transform.position; }
 
     private void OnDrawGizmos()
     {

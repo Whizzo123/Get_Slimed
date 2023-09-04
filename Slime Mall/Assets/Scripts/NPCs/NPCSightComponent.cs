@@ -8,23 +8,17 @@ using UnityEngine;
 public class NPCSightComponent : MonoBehaviour
 {
     float sightRadius;
-    List<GameObject> seenGameObjects;
+    bool seenSlime = false;
 
-    public LayerMask seeableObjectsLayer;
     private float TimeToWaitToSee = 0.1f;
     private float CurrentWaitingTimeToSee = 0.0f;
     private Vector3 debugWireSpherePosition = Vector3.zero;
 
-    private void Start()
-    {
-        seenGameObjects = new List<GameObject>();
-    }
-
-    public void UpdateSight(Vector2 dir)
+    public void UpdateSight(Vector3 dir)
     {
         if(CurrentWaitingTimeToSee >= TimeToWaitToSee)
         {
-            ScanSurroundings(dir);
+            seenSlime = ScanSurroundings(dir);
             CurrentWaitingTimeToSee = 0.0f;
         }
         else
@@ -38,34 +32,24 @@ public class NPCSightComponent : MonoBehaviour
         sightRadius = newSightRadius;
     }
 
-    public GameObject PollForSeenObjectOfType<T>()
+    public float GetSightRadius() { return sightRadius; }
+
+    private bool ScanSurroundings(Vector3 facingDirection)
     {
-        foreach(GameObject seenObject in seenGameObjects)
+        debugWireSpherePosition = transform.position;
+
+        // Any new objects add them to the list of seen things
+        if(Vector3.Distance(transform.position, PlayerController.instance.GetPosition())<=sightRadius)
         {
-            if (seenObject != null)
-            {
-                T component;
-                seenObject.TryGetComponent<T>(out component);
-                if (component != null)
-                {
-                    return seenObject;
-                }
-            }
+            Debug.Log("Seen");
+            return true;
         }
-        return null;
+        return false;
     }
 
-    private void ScanSurroundings(Vector3 facingDirection)
+    public bool IsSlimeInRange()
     {
-        seenGameObjects.Clear();
-        // Use Physics2D.overlap all
-        debugWireSpherePosition = transform.position + (facingDirection * (sightRadius - 0.5f));
-        Collider2D[] collisions = Physics2D.OverlapCircleAll(debugWireSpherePosition, sightRadius, seeableObjectsLayer);
-        // Any new objects add them to the list of seen things
-        foreach(Collider2D seenObject in collisions)
-        {
-            seenGameObjects.Add(seenObject.gameObject);
-        }
+        return seenSlime;
     }
 
     private void OnDrawGizmos()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 /*
 *AUTHOR: Antonio Villalta Isidro
 *EDITORS: Tanapat Somrid
@@ -41,12 +42,10 @@ public class NPCBehaviour : MonoBehaviour
     protected float WanderTime;
     protected float LastStep;
 
-    protected GameObject SpottedSlime;
-
-    void Awake()
+    protected virtual void Awake()
     {
         AudioSource = GetComponent<AudioSource>();
-        //EntitySpriteRenderer = GetComponent<SpriteRenderer>();
+        EntitySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
         EntityAnimator = GetComponent<Animator>();
         EntitySight = GetComponent<NPCSightComponent>();
 
@@ -135,11 +134,6 @@ public class NPCBehaviour : MonoBehaviour
                     EscapeState();
                     break;
                 }
-            case StateMachine.CHASE:
-                {
-                    ChaseState();
-                    break;
-                }
             default:
                 {
                     ChangeState(StateMachine.IDLE);
@@ -153,9 +147,7 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.ESCAPE);
+            FoundSlime();
         }
         else if (Time.time >= LastStep + IdleTime)
         {
@@ -169,13 +161,10 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.ESCAPE);
+            FoundSlime();
         }
         if (Time.time >= LastStep + WanderTime || agent.isStopped)
         {
-            agent.destination = transform.position;
             ChangeState(StateMachine.IDLE);
         }
     }
@@ -185,34 +174,28 @@ public class NPCBehaviour : MonoBehaviour
         //Runaway from the slime at high speeds or stop running away after a certain distance
         const float RunawayThresholdDistance = 7.5f;
         SpeedMultiplier = RunSpeed;
-        if (Vector3.Distance(SpottedSlime.transform.position, this.transform.position) >= RunawayThresholdDistance)
+        if (Vector3.Distance(PlayerController.instance.GetPosition(), transform.position) >= RunawayThresholdDistance)
         {
-            GetComponent<ActivatePrompt>().HideEmotion();
-            ChangeState(StateMachine.IDLE);
-        }
-        else
-        {
-            agent.SetDestination((transform.position - SpottedSlime.transform.position).normalized);
-        }
-    }
-
-    protected virtual void ChaseState()
-    {
-        //Chase the slime at high speeds or stop chasing and go back to idle
-        if (CheckForSlime() == true)
-        {
-            SpeedMultiplier = RunSpeed;
-            agent.SetDestination((SpottedSlime.transform.position - transform.position).normalized);
-        }
-        else
-        {
-            GetComponent<ActivatePrompt>().HideEmotion();
-            ChangeState(StateMachine.IDLE);
+            // GetComponent<ActivatePrompt>().HideEmotion();
             agent.destination = transform.position;
+            ChangeState(StateMachine.IDLE);
+        }
+        else
+        {
+            agent.SetDestination((transform.position - PlayerController.instance.GetPosition()).normalized * 5);
         }
     }
 
-    public Vector3 FindDirection()
+    protected virtual void FoundSlime()
+    {
+        //GetComponent<ActivatePrompt>().ShowEmotion();
+        //Stop current destination
+        agent.destination = transform.position;
+        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        ChangeState(StateMachine.ESCAPE);
+    }
+
+    protected virtual Vector3 FindDirection()
     {
         Vector3 Target = NPCManager.Instance.FindPointForMyZone(this);
         Vector3 Direction = (Target - transform.position).normalized;
@@ -230,8 +213,7 @@ public class NPCBehaviour : MonoBehaviour
     /// </summary>
     protected bool CheckForSlime()
     {
-        SpottedSlime = EntitySight.PollForSeenObjectOfType<PlayerController>();
-        bool SlimeAvailableToSpot = (SpottedSlime != null) && (SpottedSlime.GetComponent<PlayerController>().IsSlimeHidden() == false);
+        bool SlimeAvailableToSpot = (EntitySight.IsSlimeInRange()) && !PlayerController.instance.IsSlimeHidden();
         return SlimeAvailableToSpot;
     }
 
