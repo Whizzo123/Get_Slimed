@@ -42,7 +42,7 @@ public class NPCBehaviour : MonoBehaviour
     protected float WanderTime;
     protected float LastStep;
 
-    void Awake()
+    protected virtual void Awake()
     {
         AudioSource = GetComponent<AudioSource>();
         EntitySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -174,7 +174,7 @@ public class NPCBehaviour : MonoBehaviour
         //Runaway from the slime at high speeds or stop running away after a certain distance
         const float RunawayThresholdDistance = 7.5f;
         SpeedMultiplier = RunSpeed;
-        if (Vector3.Distance(PlayerController.instance.transform.position, transform.position) >= RunawayThresholdDistance)
+        if (Vector3.Distance(PlayerController.instance.GetPosition(), transform.position) >= RunawayThresholdDistance)
         {
             // GetComponent<ActivatePrompt>().HideEmotion();
             agent.destination = transform.position;
@@ -182,7 +182,7 @@ public class NPCBehaviour : MonoBehaviour
         }
         else
         {
-            agent.SetDestination((transform.position - PlayerController.instance.transform.position).normalized * 5);
+            agent.SetDestination((transform.position - PlayerController.instance.GetPosition()).normalized * 5);
         }
     }
 

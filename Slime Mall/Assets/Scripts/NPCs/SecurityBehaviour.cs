@@ -75,11 +75,17 @@ public class SecurityBehaviour : NPCBehaviour
         if (CheckForSlime() == true)
         {
             SpeedMultiplier = RunSpeed;
-            agent.SetDestination(PlayerController.instance.transform.position);
+            agent.SetDestination(PlayerController.instance.GetPosition());
+            if (Vector3.Distance(PlayerController.instance.GetPosition(), transform.position) <= EntitySight.GetSightRadius() / 4)
+            {
+                //KILL SLIME!!!
+                GameManager.Instance.CapturedEndGame();
+            }
         }
         else
         {
             //GetComponent<ActivatePrompt>().HideEmotion();
+            agent.destination = transform.position;
             ChangeState(StateMachine.IDLE);
         }
     }

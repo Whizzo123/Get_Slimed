@@ -32,6 +32,8 @@ public class NPCSightComponent : MonoBehaviour
         sightRadius = newSightRadius;
     }
 
+    public float GetSightRadius() { return sightRadius; }
+
     private bool ScanSurroundings(Vector3 facingDirection)
     {
         debugWireSpherePosition = transform.position;
