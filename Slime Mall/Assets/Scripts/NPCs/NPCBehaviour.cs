@@ -134,11 +134,6 @@ public class NPCBehaviour : MonoBehaviour
                     EscapeState();
                     break;
                 }
-            case StateMachine.CHASE:
-                {
-                    ChaseState();
-                    break;
-                }
             default:
                 {
                     ChangeState(StateMachine.IDLE);
@@ -191,23 +186,7 @@ public class NPCBehaviour : MonoBehaviour
         }
     }
 
-    protected virtual void ChaseState()
-    {
-        //Chase the slime at high speeds or stop chasing and go back to idle
-        if (CheckForSlime() == true)
-        {
-            SpeedMultiplier = RunSpeed;
-            agent.SetDestination((PlayerController.instance.transform.position - transform.position).normalized);
-        }
-        else
-        {
-            //GetComponent<ActivatePrompt>().HideEmotion();
-            ChangeState(StateMachine.IDLE);
-            agent.destination = transform.position;
-        }
-    }
-
-    void FoundSlime()
+    protected virtual void FoundSlime()
     {
         //GetComponent<ActivatePrompt>().ShowEmotion();
         //Stop current destination
@@ -216,16 +195,9 @@ public class NPCBehaviour : MonoBehaviour
         ChangeState(StateMachine.ESCAPE);
     }
 
-    public Vector3 FindDirection()
+    protected virtual Vector3 FindDirection()
     {
         Vector3 Target = NPCManager.Instance.FindPointForMyZone(this);
-        Vector3 Direction = (Target - transform.position).normalized;
-        return Direction;
-    }
-
-    public Vector3 FindGuardDirection()
-    {
-        Vector3 Target = NPCManager.Instance.FindPointForMap(this);
         Vector3 Direction = (Target - transform.position).normalized;
         return Direction;
     }

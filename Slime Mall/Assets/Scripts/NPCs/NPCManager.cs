@@ -85,7 +85,7 @@ public class NPCManager : MonoBehaviour
 
                 //Spawn new guards
                 GameObject NewNPC = Instantiate(guardPrefab.NpcPrefab, SpawnPoint, Quaternion.identity, transform);
-                //NewNPC.GetComponent<NPCBehaviour>().GetSettings(NPCList[i].NPCType);
+                NewNPC.GetComponent<NPCBehaviour>().GetSettings(guardPrefab);
 
                //GuardList.Add(NewNPC.GetComponent<NPCBehaviour>(), i);
             }

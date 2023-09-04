@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NPCSecurity
   m_EditorClassIdentifier: 
   intScore: 0
-  Speed: 3
+  Speed: 1
   Radius: 5
   IdleTime: 5
   WanderTime: 5

@@ -14,7 +14,6 @@ using UnityEngine;
 
 public class SecurityBehaviour : NPCBehaviour
 {
-
     protected override void UpdateStateMachine()
     {
         switch (MyState)
@@ -34,6 +33,11 @@ public class SecurityBehaviour : NPCBehaviour
                     ChaseState();
                     break;
                 }
+            default:
+                {
+                    ChangeState(StateMachine.IDLE);
+                    break;
+                }
         }
     }
 
@@ -42,13 +46,11 @@ public class SecurityBehaviour : NPCBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            //GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.CHASE);
+            FoundSlime();
         }
         else if (Time.time >= LastStep + IdleTime)
         {
-            agent.SetDestination(FindGuardDirection());
+            agent.SetDestination(FindDirection());
             ChangeState(StateMachine.WANDER);
         }
     }
@@ -58,15 +60,43 @@ public class SecurityBehaviour : NPCBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            //GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.CHASE);
+            FoundSlime();
         }
         if (Time.time >= LastStep + WanderTime || agent.isStopped)
         {
             agent.destination = transform.position;
             ChangeState(StateMachine.IDLE);
         }
+    }
+
+    protected void ChaseState()
+    {
+        //Chase the slime at high speeds or stop chasing and go back to idle
+        if (CheckForSlime() == true)
+        {
+            SpeedMultiplier = RunSpeed;
+            agent.SetDestination(PlayerController.instance.transform.position);
+        }
+        else
+        {
+            //GetComponent<ActivatePrompt>().HideEmotion();
+            ChangeState(StateMachine.IDLE);
+        }
+    }
+
+    protected override void FoundSlime()
+    {
+        //Stop current destination
+        agent.destination = transform.position;
+        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        ChangeState(StateMachine.CHASE);
+    }
+
+    protected override Vector3 FindDirection()
+    {
+        Vector3 Target = NPCManager.Instance.FindPointForMap(this);
+        Vector3 Direction = (Target - transform.position).normalized;
+        return Direction;
     }
 
     public void OnCollisionEnter2D(Collision2D Collision)

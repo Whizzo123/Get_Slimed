@@ -177,10 +177,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5545669895181738796}
-  - component: {fileID: 1289347900533808813}
-  - component: {fileID: 451418686725913162}
   - component: {fileID: -4163220397966487634}
+  - component: {fileID: 1289347900533808813}
   - component: {fileID: 7231501112556352519}
+  - component: {fileID: 451418686725913162}
   - component: {fileID: 5240641694321102826}
   - component: {fileID: 5240641694321102827}
   - component: {fileID: 1914582667734261094}
@@ -208,6 +208,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4163220397966487634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545669895181738786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 241f6b87f2bd8074483b58257eec0c93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EntitySpriteRenderer: {fileID: 965696525688443530}
 --- !u!114 &1289347900533808813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,6 +235,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   emotionResponse: {fileID: 464223399366905437}
   onlyEmotion: 0
+--- !u!114 &7231501112556352519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545669895181738786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d446bb44a01a6c4b97d72c1d4b11d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &451418686725913162
 Animator:
   serializedVersion: 5
@@ -243,31 +268,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-4163220397966487634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5545669895181738786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 241f6b87f2bd8074483b58257eec0c93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EntitySpriteRenderer: {fileID: 965696525688443530}
---- !u!114 &7231501112556352519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5545669895181738786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d446bb44a01a6c4b97d72c1d4b11d8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &5240641694321102826
 AudioSource:
   m_ObjectHideFlags: 0
