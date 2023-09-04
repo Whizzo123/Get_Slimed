@@ -152,9 +152,7 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            //GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.ESCAPE);
+            FoundSlime();
         }
         else if (Time.time >= LastStep + IdleTime)
         {
@@ -168,13 +166,10 @@ public class NPCBehaviour : MonoBehaviour
         SpeedMultiplier = BaseSpeed;
         if (CheckForSlime() == true)
         {
-            //GetComponent<ActivatePrompt>().ShowEmotion();
-            AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
-            ChangeState(StateMachine.ESCAPE);
+            FoundSlime();
         }
         if (Time.time >= LastStep + WanderTime || agent.isStopped)
         {
-            agent.destination = transform.position;
             ChangeState(StateMachine.IDLE);
         }
     }
@@ -184,14 +179,15 @@ public class NPCBehaviour : MonoBehaviour
         //Runaway from the slime at high speeds or stop running away after a certain distance
         const float RunawayThresholdDistance = 7.5f;
         SpeedMultiplier = RunSpeed;
-        if (Vector3.Distance(PlayerController.instance.transform.position, this.transform.position) >= RunawayThresholdDistance)
+        if (Vector3.Distance(PlayerController.instance.transform.position, transform.position) >= RunawayThresholdDistance)
         {
             // GetComponent<ActivatePrompt>().HideEmotion();
+            agent.destination = transform.position;
             ChangeState(StateMachine.IDLE);
         }
         else
         {
-            agent.SetDestination((transform.position - PlayerController.instance.transform.position).normalized);
+            agent.SetDestination((transform.position - PlayerController.instance.transform.position).normalized * 5);
         }
     }
 
@@ -209,6 +205,15 @@ public class NPCBehaviour : MonoBehaviour
             ChangeState(StateMachine.IDLE);
             agent.destination = transform.position;
         }
+    }
+
+    void FoundSlime()
+    {
+        //GetComponent<ActivatePrompt>().ShowEmotion();
+        //Stop current destination
+        agent.destination = transform.position;
+        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        ChangeState(StateMachine.ESCAPE);
     }
 
     public Vector3 FindDirection()
@@ -236,7 +241,7 @@ public class NPCBehaviour : MonoBehaviour
     /// </summary>
     protected bool CheckForSlime()
     {
-        bool SlimeAvailableToSpot = (EntitySight.IsSlimeInRange()) && (PlayerController.instance.IsSlimeHidden() == false);
+        bool SlimeAvailableToSpot = (EntitySight.IsSlimeInRange()) && !PlayerController.instance.IsSlimeHidden();
         return SlimeAvailableToSpot;
     }
 

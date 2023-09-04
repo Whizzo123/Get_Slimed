@@ -18,7 +18,7 @@ public class NPCSightComponent : MonoBehaviour
     {
         if(CurrentWaitingTimeToSee >= TimeToWaitToSee)
         {
-            ScanSurroundings(dir);
+            seenSlime = ScanSurroundings(dir);
             CurrentWaitingTimeToSee = 0.0f;
         }
         else
@@ -32,7 +32,7 @@ public class NPCSightComponent : MonoBehaviour
         sightRadius = newSightRadius;
     }
 
-    private void ScanSurroundings(Vector3 facingDirection)
+    private bool ScanSurroundings(Vector3 facingDirection)
     {
         debugWireSpherePosition = transform.position;
 
@@ -40,10 +40,9 @@ public class NPCSightComponent : MonoBehaviour
         if(Vector3.Distance(transform.position, PlayerController.instance.GetPosition())<=sightRadius)
         {
             Debug.Log("Seen");
-            seenSlime = true;
-            return;
+            return true;
         }
-        seenSlime = false;
+        return false;
     }
 
     public bool IsSlimeInRange()
