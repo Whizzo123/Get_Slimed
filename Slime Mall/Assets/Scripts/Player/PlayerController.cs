@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
                         bIsTeleporting = true;
                         targetNPC = null;
                         targetHS = ta.GetHidingSpot();
-                        agent.speed = moveSpeed * 2;
+                        agent.speed = moveSpeed * 6;
                         agent.SetDestination(targetHS.transform.position);
                         return;
                     }

@@ -8,10 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FinalScenes/Menu.unity
     guid: b5645e4d1ad77194f83909b25e9b6144
-  - enabled: 0
-    path: Assets/Scenes/FinalScenes/Game.unity
-    guid: b73a505f3f7d0124cbdbf84fffdca682
   - enabled: 1
-    path: Assets/Scenes/NewMechanics.unity
-    guid: 8868a53d37f21244a8207f3b2d7b8b59
+    path: Assets/Scenes/FinalScenes/Level0.unity
+    guid: ef52627e4d10f6f4bbd9d2ca7184acfa
   m_configObjects: {}

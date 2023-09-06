@@ -44,15 +44,15 @@ public class NPCManager : MonoBehaviour
     public Vector3 FindPointForMyZone(NPCBehaviour npc)
     {
         int zone = NPCInZone[npc];
-        float movePointX = Random.Range(SpawnZones[zone].bounds.min.x, SpawnZones[zone].bounds.max.x);
-        float movePointZ = Random.Range(SpawnZones[zone].bounds.min.z, SpawnZones[zone].bounds.max.z);
+        float movePointX = Random.Range(SpawnZones[zone].bounds.min.x, SpawnZones[zone].bounds.max.x)/* + SpawnZones[zone].transform.position.x + SpawnZones[zone].center.x*/;
+        float movePointZ = Random.Range(SpawnZones[zone].bounds.min.z, SpawnZones[zone].bounds.max.z)/* + SpawnZones[zone].transform.position.z + SpawnZones[zone].center.y*/;
         return new Vector3(movePointX, 0, movePointZ);
     }
 
     public Vector3 FindPointForMap(NPCBehaviour npc) 
     {
-        float movePointX = Random.Range(-10, 10);
-        float movePointZ = Random.Range(-10, 10);
+        float movePointX = Random.Range(-25, 25);
+        float movePointZ = Random.Range(10, 40);
         return new Vector3(movePointX, 0, movePointZ);
     }
 
@@ -86,8 +86,6 @@ public class NPCManager : MonoBehaviour
                 //Spawn new guards
                 GameObject NewNPC = Instantiate(guardPrefab.NpcPrefab, SpawnPoint, Quaternion.identity, transform);
                 NewNPC.GetComponent<NPCBehaviour>().GetSettings(guardPrefab);
-
-               //GuardList.Add(NewNPC.GetComponent<NPCBehaviour>(), i);
             }
         }
     }

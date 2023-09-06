@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     [Tooltip("How much time you gain per kill")] int KillTimeValue = 1;//SUGGESTION: Move it to the NPC's in case we have varying NPC's that offer different time gain
 
     bool bIsGameFinished = false;
+
+    public float GameSpeed = 1.0f;
     public bool IsGameFinished
     {
         get
@@ -56,6 +58,9 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        //Cheats
+        Time.timeScale = GameSpeed;
+
         if(!bIsGamePaused /*And started*/)
         {
             SessionLength -= Time.deltaTime;

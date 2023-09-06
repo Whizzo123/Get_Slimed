@@ -197,9 +197,7 @@ public class NPCBehaviour : MonoBehaviour
 
     protected virtual Vector3 FindDirection()
     {
-        Vector3 Target = NPCManager.Instance.FindPointForMyZone(this);
-        Vector3 Direction = (Target - transform.position).normalized;
-        return Direction;
+        return NPCManager.Instance.FindPointForMyZone(this);
     }
 
     protected void ChangeState(StateMachine state)

@@ -100,9 +100,7 @@ public class SecurityBehaviour : NPCBehaviour
 
     protected override Vector3 FindDirection()
     {
-        Vector3 Target = NPCManager.Instance.FindPointForMap(this);
-        Vector3 Direction = (Target - transform.position).normalized;
-        return Direction;
+        return NPCManager.Instance.FindPointForMap(this);
     }
 
     public void OnCollisionEnter2D(Collision2D Collision)
