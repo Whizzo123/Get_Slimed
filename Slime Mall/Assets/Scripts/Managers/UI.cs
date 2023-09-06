@@ -12,7 +12,15 @@ public class UI : MonoBehaviour
 
     public GameObject mainMenuScreen;
     public GameObject pauseScreen;
+
     public GameObject settingsScreen;
+    public Slider masterVolumeSlider;
+    public TextMeshProUGUI masterVolumeText;
+    public Slider soundVolumeSlider;
+    public TextMeshProUGUI soundVolumeText;
+    public Slider musicVolumeSlider;
+    public TextMeshProUGUI musicVolumeText;
+
     public GameObject creditsScreen;
 
     public GameObject guiScreen;
@@ -81,6 +89,24 @@ public class UI : MonoBehaviour
     {
         settingsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
+    }
+
+    public void MasterVolumeChanged()
+    {
+        AudioManager.instance.ChangeMasterVolume(masterVolumeSlider.value / 10);
+        masterVolumeText.text = (masterVolumeSlider.value * 10).ToString() + "%";
+    }
+
+    public void SoundVolumeChanged()
+    {
+        AudioManager.instance.ChangeSoundVolume(soundVolumeSlider.value / 10);
+        soundVolumeText.text = (soundVolumeSlider.value * 10).ToString() + "%";
+    }
+
+    public void MusicVolumeChanged()
+    {
+        AudioManager.instance.ChangeMusicVolume(musicVolumeSlider.value / 10);
+        musicVolumeText.text = (musicVolumeSlider.value * 10).ToString() + "%";
     }
 
     public void CreditsButton()
