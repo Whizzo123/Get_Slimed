@@ -47,5 +47,45 @@ MonoBehaviour:
   MusicVolume: 1
   SoundVolume: 1
   MasterVolume: 1
-  SoundBank: []
+  SoundBank:
+  - Name: FemScream
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 5177bfbb2056af242aeb9a24d02a3c06, type: 3}
+    Source: {fileID: 0}
+  - Name: ManScream
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 849d2c2528271e34fb195da0ab2d40b7, type: 3}
+    Source: {fileID: 0}
+  - Name: SlimeConsume
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 7acbf1034a9507547af124c5a0f67d3c, type: 3}
+    Source: {fileID: 0}
+  - Name: SlimeInteract
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 02c7a4962ad7c404d82b892fea27e0c7, type: 3}
+    Source: {fileID: 0}
+  - Name: SlimeInteract
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 02c7a4962ad7c404d82b892fea27e0c7, type: 3}
+    Source: {fileID: 0}
+  - Name: GuardCapture
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: b397c9d90e8673842b08136f12b76b3f, type: 3}
+    Source: {fileID: 0}
+  - Name: GuardSpot
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: 6c2499c7496dc694dae1fd275e4c5eae, type: 3}
+    Source: {fileID: 0}
+  - Name: UIClick
+    Volume: 1
+    Loop: 0
+    Clip: {fileID: 8300000, guid: ea72588a2bfec374588ec15bc7daa4f9, type: 3}
+    Source: {fileID: 0}
   MusicBank: []

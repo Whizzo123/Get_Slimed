@@ -94,7 +94,7 @@ public class SecurityBehaviour : NPCBehaviour
     {
         //Stop current destination
         agent.destination = transform.position;
-        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        AudioManager.instance.PlaySound("GuardSpot");
         ChangeState(StateMachine.CHASE);
     }
 

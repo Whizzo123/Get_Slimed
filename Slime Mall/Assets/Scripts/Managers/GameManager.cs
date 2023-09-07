@@ -116,10 +116,9 @@ public class GameManager : MonoBehaviour
             bIsGameFinished = true;
             SetHighScore();
             FindObjectOfType<PlayerController>().FreezePlayer();
-            AudioManager.instance.PlaySound("Capture");
+            AudioManager.instance.PlaySound("GuardCapture");
             //Load in end screen ui
             UI.instance.CapturedEnd(Score, HighScore);
-
         }
 
     }

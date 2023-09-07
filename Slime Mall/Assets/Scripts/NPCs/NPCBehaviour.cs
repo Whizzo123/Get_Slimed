@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -20,7 +21,6 @@ public class NPCBehaviour : MonoBehaviour
 
     //protected float Radius;
     [Header("Components")]
-    protected AudioSource AudioSource;
     [SerializeField]
     protected SpriteRenderer EntitySpriteRenderer;
     protected NavMeshAgent agent;
@@ -42,9 +42,10 @@ public class NPCBehaviour : MonoBehaviour
     protected float WanderTime;
     protected float LastStep;
 
+    protected string sfxName;
+
     protected virtual void Awake()
     {
-        AudioSource = GetComponent<AudioSource>();
         EntitySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
         EntityAnimator = GetComponent<Animator>();
         EntitySight = GetComponent<NPCSightComponent>();
@@ -69,16 +70,7 @@ public class NPCBehaviour : MonoBehaviour
             EntitySpriteRenderer.flipX = false;
         }
 
-        //This makes the Entities sight face downards when idle.
-        //This is to account for the fact that when we idle, our sprite appears to be facing downwards as we don't have idle animations for other directions
-        if (agent.isStopped)
-        {
-            EntitySight.UpdateSight(new Vector3(0, 0, -1));
-        }
-        else
-        {
-            EntitySight.UpdateSight(dir);
-        }
+        EntitySight.UpdateSight();
 
         //Animation 
         EntityAnimator.SetFloat("Horizontal", agent.velocity.normalized.x);
@@ -113,6 +105,8 @@ public class NPCBehaviour : MonoBehaviour
         //Wander Time
         Offset = Random.Range(WanderTime, WanderTime + 5);
         WanderTime = settings.WanderTime + Offset;
+
+        sfxName = settings.audioTrackName;
     }
 
     protected virtual void UpdateStateMachine()
@@ -191,7 +185,7 @@ public class NPCBehaviour : MonoBehaviour
         //GetComponent<ActivatePrompt>().ShowEmotion();
         //Stop current destination
         agent.destination = transform.position;
-        AudioManager.instance.PlaySoundFromSource(SpotSoundIdentifier, AudioSource);
+        AudioManager.instance.PlaySound(sfxName);
         ChangeState(StateMachine.ESCAPE);
     }
 

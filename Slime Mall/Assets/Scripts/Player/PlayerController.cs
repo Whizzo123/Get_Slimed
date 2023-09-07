@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.Interactions;
 using UnityEngine.AI;
 using static NPCManager;
 using UnityEditor.UI;
+using UnityEditor.Rendering.LookDev;
 
 /*
 *AUTHOR: Antonio Villalta Isidro
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     AudioSource audioSource;
     NavMeshAgent agent;
+    TrailRenderer tr;
 
     SpriteRenderer sr;
     Vector3 dir;
@@ -43,6 +45,9 @@ public class PlayerController : MonoBehaviour
     Vector3 hitPos;
     bool isPressed = false;
 
+    public GameObject clickParticle;
+    public GameObject consumeParticle;
+
     public static event Action OnAddScore;
 
     void Awake()
@@ -52,6 +57,8 @@ public class PlayerController : MonoBehaviour
 
         //References
         input = new Controls();
+        tr = GetComponentInChildren<TrailRenderer>();
+        tr.enabled = false;
         sr = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
@@ -64,7 +71,12 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
-        input.Touch.MoveClick.started += DoActionOnClick;
+        input.Touch.MoveClick.started += context =>
+        {
+            DoActionOnClick(context);
+            //Play sfx
+            AudioManager.instance.PlaySound("SlimeInteract");
+        };
         input.Touch.MoveClick.performed += context =>
         {
             if (context.interaction is HoldInteraction)
@@ -79,7 +91,12 @@ public class PlayerController : MonoBehaviour
         };
         input.Touch.MoveClick.Enable();
 
-        input.Touch.MoveTouch.started += DoActionOnTouch;
+        input.Touch.MoveTouch.started += context =>
+        {
+            DoActionOnTouch(context);
+            //Play sfx
+            AudioManager.instance.PlaySound("SlimeInteract");
+        };
         input.Touch.MoveTouch.performed += context =>
         {
             if (context.interaction is HoldInteraction)
@@ -176,14 +193,21 @@ public class PlayerController : MonoBehaviour
         if (!agent.enabled) return;
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        //Spawn Particles
+        Vector3 particleLocation = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector3 finalLocation = new Vector3(particleLocation.x, 0, particleLocation.z);
+        Instantiate(clickParticle, finalLocation, Quaternion.Euler(-90, 0, 0));
         Action(ray);
     }
 
     void DoActionOnTouch(InputAction.CallbackContext obj)
     {
-        if (!agent.enabled) return;
+        if (!agent.enabled) return;        
         //Create ray
         Ray ray = Camera.main.ScreenPointToRay(obj.ReadValue<Vector2>());
+        //Spawn Particles
+        Vector3 particleLocation = new Vector3(obj.ReadValue<Vector2>().x, 0, obj.ReadValue<Vector2>().y);
+        Instantiate(clickParticle, particleLocation, Quaternion.Euler(-90, 0, 0));
         Action(ray);
     }
 
@@ -216,6 +240,7 @@ public class PlayerController : MonoBehaviour
                         targetHS = ta.GetHidingSpot();
                         agent.speed = moveSpeed * 6;
                         agent.SetDestination(targetHS.transform.position);
+                        tr.enabled = true;
                         return;
                     }
                 }
@@ -289,6 +314,9 @@ public class PlayerController : MonoBehaviour
         //Trying out new Design Pattern: Observer
         OnAddScore?.Invoke();
 
+        //Spawn Particles
+        Instantiate(consumeParticle, transform.position, Quaternion.identity);
+
         targetNPC = null;
     }
 
@@ -315,6 +343,7 @@ public class PlayerController : MonoBehaviour
 
         bIsHidden = true;
         bIsTeleporting = false;
+        tr.enabled = false;
         //targetHS = null;
         agent.enabled = true;
         agent.speed = moveSpeed;

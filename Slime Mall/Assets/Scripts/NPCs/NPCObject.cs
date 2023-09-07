@@ -34,4 +34,5 @@ public class NPCObject : ScriptableObject
     public string SpotSoundIdentifier;
     public GameObject NpcPrefab;
     public bool Killed = false;
+    public string audioTrackName;
 }

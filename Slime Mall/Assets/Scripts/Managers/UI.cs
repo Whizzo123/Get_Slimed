@@ -74,12 +74,14 @@ public class UI : MonoBehaviour
 
     public void UpdateScore()
     {
+        AudioManager.instance.PlaySound("SlimeConsume");
         int scoreToAdd = int.Parse(score.text) + KillScoreValue;
         score.SetText(scoreToAdd.ToString());
     }
 
     public void PlayButton(int index)
     {
+        AudioManager.instance.PlaySound("UIClick");
         mainMenuScreen.SetActive(false);
         GameManager.Instance.LoadLevel(index);
         if(PlayerController.instance != null) PlayerController.instance.Cleanup();
@@ -87,36 +89,42 @@ public class UI : MonoBehaviour
 
     public void SettingsButton()
     {
+        AudioManager.instance.PlaySound("UIClick");
         settingsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
     }
 
     public void MasterVolumeChanged()
     {
+        AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeMasterVolume(masterVolumeSlider.value / 10);
         masterVolumeText.text = (masterVolumeSlider.value * 10).ToString() + "%";
     }
 
     public void SoundVolumeChanged()
     {
+        AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeSoundVolume(soundVolumeSlider.value / 10);
         soundVolumeText.text = (soundVolumeSlider.value * 10).ToString() + "%";
     }
 
     public void MusicVolumeChanged()
     {
+        AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeMusicVolume(musicVolumeSlider.value / 10);
         musicVolumeText.text = (musicVolumeSlider.value * 10).ToString() + "%";
     }
 
     public void CreditsButton()
     {
+        AudioManager.instance.PlaySound("UIClick");
         creditsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
     }
 
     public void BackButton()
     {
+        AudioManager.instance.PlaySound("UIClick");
         mainMenuScreen.SetActive(true);
         settingsScreen.SetActive(false);
         creditsScreen.SetActive(false);

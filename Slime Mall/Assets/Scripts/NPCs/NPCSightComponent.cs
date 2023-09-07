@@ -14,11 +14,11 @@ public class NPCSightComponent : MonoBehaviour
     private float CurrentWaitingTimeToSee = 0.0f;
     private Vector3 debugWireSpherePosition = Vector3.zero;
 
-    public void UpdateSight(Vector3 dir)
+    public void UpdateSight()
     {
         if(CurrentWaitingTimeToSee >= TimeToWaitToSee)
         {
-            seenSlime = ScanSurroundings(dir);
+            seenSlime = ScanSurroundings();
             CurrentWaitingTimeToSee = 0.0f;
         }
         else
@@ -34,7 +34,7 @@ public class NPCSightComponent : MonoBehaviour
 
     public float GetSightRadius() { return sightRadius; }
 
-    private bool ScanSurroundings(Vector3 facingDirection)
+    private bool ScanSurroundings()
     {
         debugWireSpherePosition = transform.position;
 
