@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 using UnityEngine.AI;
 using static NPCManager;
 using UnityEditor.UI;
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
     bool bIsTeleporting = false;
 
     Vector3 hitPos;
+    bool isPressed = false;
 
     public static event Action OnAddScore;
 
@@ -62,10 +64,34 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed += DoPause;
         input.Movement.Pause.Enable();
 
-        input.Touch.MoveClick.performed += DoActionOnClick;
+        input.Touch.MoveClick.started += DoActionOnClick;
+        input.Touch.MoveClick.performed += context =>
+        {
+            if (context.interaction is HoldInteraction)
+            {
+                isPressed = true;
+            }
+        };
+        input.Touch.MoveClick.canceled += context =>
+        {
+            DoActionOnClick(context);
+            isPressed = false;
+        };
         input.Touch.MoveClick.Enable();
 
-        input.Touch.MoveTouch.performed += DoActionOnTouch;
+        input.Touch.MoveTouch.started += DoActionOnTouch;
+        input.Touch.MoveTouch.performed += context =>
+        {
+            if (context.interaction is HoldInteraction)
+            {
+                isPressed = true;
+            }
+        };
+        input.Touch.MoveTouch.canceled += context =>
+        {
+            DoActionOnTouch(context);
+            isPressed = false;
+        };
         input.Touch.MoveTouch.Enable();
     }
 
@@ -74,10 +100,16 @@ public class PlayerController : MonoBehaviour
         input.Movement.Pause.performed -= DoPause;
         input.Movement.Pause.Disable();
 
+        input.Touch.MoveTouch.started -= DoActionOnTouch;
         input.Touch.MoveTouch.performed -= DoActionOnTouch;
+        input.Touch.MoveTouch.canceled -= DoActionOnTouch;
+        input.Touch.MoveTouch.Reset();
         input.Touch.MoveTouch.Disable();
 
+        input.Touch.MoveClick.started -= DoActionOnClick;
         input.Touch.MoveClick.performed -= DoActionOnClick;
+        input.Touch.MoveClick.canceled -= DoActionOnClick;
+        input.Touch.MoveClick.Reset();
         input.Touch.MoveClick.Disable();
     }
 
@@ -86,8 +118,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsGamePaused)
         {
-            dir = agent.destination - transform.position;
-            
+            dir = agent.destination - transform.position;           
+
             //Check on targets
             if(targetNPC)
             {
@@ -117,6 +149,24 @@ public class PlayerController : MonoBehaviour
             else if (dir.x > 0)
             {
                 sr.flipX = false;
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (!GameManager.Instance.IsGamePaused)
+        {
+            if (isPressed)
+            {
+                if (!agent.enabled) return;
+                //Create ray
+#if !UNITY_EDITOR
+                Ray ray = Camera.main.ScreenPointToRay(input.Touch.MoveTouch.ReadValue<Vector2>());
+#else
+                Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+#endif
+                Action(ray);
             }
         }
     }

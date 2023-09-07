@@ -218,7 +218,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""id"": ""72169be9-a1e7-4d9c-ae0e-ca1c23209321"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""initialStateCheck"": true
                 }
             ],
@@ -227,7 +227,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""03410e0d-b283-4d97-9044-129a911f15c1"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold,Tap"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MoveClick"",
@@ -238,7 +238,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""5a668b30-39cb-4834-aee3-c21ca48c44f5"",
                     ""path"": ""<Touchscreen>/position"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold,Tap"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MoveTouch"",
