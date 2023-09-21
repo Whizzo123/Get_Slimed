@@ -64,7 +64,7 @@ public class UI : MonoBehaviour
     public void UpdateLoadingScreen(float progress)
     {
         slider.value = progress;
-        progressText.text = progress * 100f + "%";
+        progressText.text = (progress * 100f).ToString();
     }
 
     public void UpdatedTimer(float minutes, float seconds)
@@ -98,21 +98,21 @@ public class UI : MonoBehaviour
     {
         AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeMasterVolume(masterVolumeSlider.value / 10);
-        masterVolumeText.text = (masterVolumeSlider.value * 10).ToString() + "%";
+        masterVolumeText.text = (masterVolumeSlider.value * 10).ToString();
     }
 
     public void SoundVolumeChanged()
     {
         AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeSoundVolume(soundVolumeSlider.value / 10);
-        soundVolumeText.text = (soundVolumeSlider.value * 10).ToString() + "%";
+        soundVolumeText.text = (soundVolumeSlider.value * 10).ToString();
     }
 
     public void MusicVolumeChanged()
     {
         AudioManager.instance.PlaySound("UIClick");
         AudioManager.instance.ChangeMusicVolume(musicVolumeSlider.value / 10);
-        musicVolumeText.text = (musicVolumeSlider.value * 10).ToString() + "%";
+        musicVolumeText.text = (musicVolumeSlider.value * 10).ToString();
     }
 
     public void CreditsButton()
