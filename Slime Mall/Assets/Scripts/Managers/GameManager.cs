@@ -88,6 +88,10 @@ public class GameManager : MonoBehaviour
         UI.instance.PauseActive(bIsGamePaused);
     }
 
+    public void SetScore(int _score)
+    {
+        Score = _score;
+    }
  
     private void SetHighScore()
     {

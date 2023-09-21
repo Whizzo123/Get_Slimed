@@ -77,6 +77,7 @@ public class UI : MonoBehaviour
         AudioManager.instance.PlaySound("SlimeConsume");
         int scoreToAdd = int.Parse(score.text) + KillScoreValue;
         score.SetText(scoreToAdd.ToString());
+        GameManager.Instance.SetScore(scoreToAdd);
     }
 
     public void PlayButton(int index)
